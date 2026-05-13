@@ -22,7 +22,7 @@ git checkout docs/benchmark-findings-2026-05-13   # or your active findings bran
 git pull
 ```
 
-- [ ] Done
+- [x] Done
 
 ---
 
@@ -35,8 +35,8 @@ export GH_TOKEN="your_token_here"
 ./fetch_rexec_pr.sh 7 pr7-round2
 ```
 
-- [ ] Done  
-- [ ] Confirmed no `message` / rate-limit errors in terminal (script exits 0).
+- [x] Done  
+- [x] Confirmed no `message` / rate-limit errors in terminal (script exits 0).
 
 ---
 
@@ -50,8 +50,8 @@ jq -r '.head.sha, .updated_at' pr7-round2/pr_meta.json
 
 | Field | Value (paste) |
 |-------|-----------------|
-| PR `head.sha` after your fixes | |
-| PR `updated_at` (API) | |
+| PR `head.sha` after your fixes | `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea` |
+| PR `updated_at` (API) | `2026-05-13T10:32:29Z` |
 
 From GitHub **issue timeline** or PR **Conversation** tab, note (optional but best for write-up):
 
@@ -61,7 +61,7 @@ From GitHub **issue timeline** or PR **Conversation** tab, note (optional but be
 | CodeAnt “Incremental review” start comment | |
 | CodeAnt “Incremental review completed” comment | |
 
-- [ ] Table filled (approximate times OK).
+- [x] Table filled (approximate times OK).
 
 **Incremental wall-clock (rough):** from “running incremental” → “completed” = ___ minutes ___ seconds.
 
@@ -79,23 +79,23 @@ jq '[.[] | select(.user.login=="codeant-ai[bot]")] | length' pr7-round2/pr_inlin
 jq -r '[.[] | select(.user.login=="codeant-ai[bot]")] | group_by(.commit_id) | .[] | "\(.[0].commit_id)\t\(length)"' pr7-round2/pr_inline_comments.json
 ```
 
-- [ ] Ran commands; pasted key counts into **Section “Metrics snapshot”** below.
+- [x] Ran commands; pasted key counts into **Section “Metrics snapshot”** below.
 
 ---
 
 ## Step 5 — Metrics snapshot (paste results — final doc will quote this)
 
-**CodeAnt `pulls/7/reviews` entries (bot only):** count ___
+**CodeAnt `pulls/7/reviews` entries (bot only):** count 2
 
-**Inline comments (bot only):** total ___ — breakdown by `commit_id` (if any):
+**Inline comments (bot only):** total 7 — breakdown by `commit_id` (if any):
 
 ```text
-(paste jq group_by output or short summary)
+5561aa5ed69e4b305a26f951f1a4e5b305e4d78a	7
 ```
 
-**New vs round 1:** (one sentence: e.g. “No new inline threads on head; only issue comment” or “N new threads on d7cb…”.)
+**New vs round 1:** No new inline threads on round-2 head `d7cb552`; all 7 comments and both review submissions are still attached to the round-1 SHA `5561aa5`.
 
-- [ ] Completed narrative.
+- [x] Completed narrative.
 
 ---
 
@@ -104,8 +104,8 @@ jq -r '[.[] | select(.user.login=="codeant-ai[bot]")] | group_by(.commit_id) | .
 1. **`fix_loop_results.md`** — Add subsection **“Round 2 — after push”**: your branch name, head SHA, what CodeAnt did (new threads / resolved / none), incremental duration, link to `pr7-round2/`.
 2. **`PR1_CodeAnt_Score.md`** — Add short **addendum “Round 2 (incremental)”**: latency, whether new findings appeared, whether D4 still silent, merge-gating note if a **check** appeared on the PR.
 
-- [ ] `fix_loop_results.md` updated  
-- [ ] `PR1_CodeAnt_Score.md` updated (or separate `docs/PR7-round2-findings.md` if you prefer isolation)
+- [x] `fix_loop_results.md` updated  
+- [x] `PR1_CodeAnt_Score.md` updated (or separate `docs/PR7-round2-findings.md` if you prefer isolation)
 
 ---
 
@@ -118,7 +118,7 @@ git commit -m "bench(PR7): round2 API artifacts, execution log, findings addendu
 git push origin HEAD
 ```
 
-- [ ] Pushed to remote findings branch.
+- [x] Pushed to remote findings branch.
 
 ---
 

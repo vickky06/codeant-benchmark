@@ -84,3 +84,16 @@ Validate the correctness of the flagged issue. If correct, How can I resolve thi
 ```
 
 **Why it matters for the benchmark:** fix-me latency and edit quality reflect **template + comment + follow-up policy**, not the inline comment alone—useful when comparing vendors or Cursor versions and when interpreting `fix_loop_results.md`.
+
+### Round 2 (incremental)
+
+After fixes were pushed to PR #7 (new head `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea`, `updated_at 2026-05-13T10:32:29Z`), the round-2 snapshot under `pr7-round2/` shows:
+
+- **Reviews on new head:** 0 (both `pr_reviews.json` entries still point at round-1 commit `5561aa5...`).
+- **Inline comments on new head:** 0 (all 7 still on `5561aa5...`).
+- **Incremental latency:** not measurable — no second review was published.
+- **New findings:** none.
+- **D4 status: still unmentioned** — the silent-overwrite blind spot persists into round 2 by default (no new review = no new chance to catch it).
+- **Merge-gating check:** none — no APPROVED / CHANGES_REQUESTED state recorded; both submissions remain `COMMENTED`.
+
+**Read-out:** the "incremental review" did not actually occur on the new commit in this snapshot window. Either the bot was not re-triggered, the trigger fired but produced no diff-relevant findings, or the snapshot was taken before the second pass completed. For pilot purposes, treat "round 2 = silent" as a real outcome to investigate, not as evidence the fixes were accepted.
