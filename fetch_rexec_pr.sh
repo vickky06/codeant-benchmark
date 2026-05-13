@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Fetch GitHub PR JSON artifacts for vickky06/Rexec (CodeAnt / manual scoring).
 # Usage: export GH_TOKEN=ghp_xxx && ./fetch_rexec_pr.sh 8
+#        export GH_TOKEN=ghp_xxx && ./fetch_rexec_pr.sh 7 pr7-round2   # custom folder (e.g. second review)
 set -euo pipefail
 
-PR="${1:?Usage: $0 <PR_NUMBER>}"
+PR="${1:?Usage: $0 <PR_NUMBER> [OUTPUT_DIR]}"
+OUT_NAME="${2:-pr${PR}}"
 REPO="vickky06/Rexec"
 DIR="$(cd "$(dirname "$0")" && pwd)"
-OUT="${DIR}/pr${PR}"
+OUT="${DIR}/${OUT_NAME}"
 mkdir -p "$OUT"
 
 if [[ -z "${GH_TOKEN:-}" ]]; then
@@ -36,4 +38,4 @@ for f in "$OUT"/*.json; do
   fi
 done
 
-echo "Done. Open $OUT/ and score PR2 (FP/noise/latency) per docs/PR2-clean-control-spec.md"
+echo "Done. Open $OUT/ — PR8 scoring: docs/PR2-clean-control-spec.md — PR7 round-2 log: docs/PR7-ROUND2-EXECUTION-LOG.md"
