@@ -133,6 +133,7 @@ When you merge the findings branch to `main` (or publish internally), the **fina
 | `fix_loop_results.md` | Fix strategy + round 2 outcome |
 | `pr7-round2/*.json` | Reproducible API snapshot for round 2 |
 | `pr8/*.json` | Control arm snapshot |
+| `docs/PR8-comments-inventory.md` | **PR #8** — thread-level inventory (clean control; not part of PR #7 round 2 unless you re-push PR #8) |
 | `docs/PR7-ROUND2-EXECUTION-LOG.md` | This runbook (checklist + provenance) |
 | `Plan.MD` | Overall plan / completed vs remaining |
 

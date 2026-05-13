@@ -4,6 +4,8 @@
 **Title:** feat: add max code length validation to prevent oversized payloads  
 **Design:** No seeded defects — measures **false positives**, **noise**, **summary quality**, and **warm-path latency** vs PR [#7](https://github.com/vickky06/Rexec/pull/7).
 
+Thread-level inventory (ids, links, `commit_id`): **`docs/PR8-comments-inventory.md`**.
+
 ## Timeline (UTC)
 
 | Milestone | Time |
