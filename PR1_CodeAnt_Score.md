@@ -51,7 +51,7 @@ Yes — proceed to a Bitbucket pilot: 85% weighted recall with zero false positi
 
 ### Artifacts in this repo
 
-JSON snapshots and scripts used for scoring live alongside this file: `pr1_meta.json`, `pr1_inline_comments.json`, `pr1_reviews.json`, `pr1_issue_comments.json`, `score_pr1.sh`, `score_template.md`, `Rexec_PR1_AnswerKey.md`.
+JSON snapshots and scripts used for scoring live alongside this file: `pr1_meta.json`, `pr1_inline_comments.json`, `pr1_reviews.json`, `pr1_issue_comments.json`, `fetch_rexec_pr.sh`, `score_template.md`, `Rexec_PR1_AnswerKey.md`. Post-fix snapshot: **`pr7-round2/`**.
 
 ### Summary vs inline (reconciled)
 
@@ -85,15 +85,26 @@ Validate the correctness of the flagged issue. If correct, How can I resolve thi
 
 **Why it matters for the benchmark:** fix-me latency and edit quality reflect **template + comment + follow-up policy**, not the inline comment alone—useful when comparing vendors or Cursor versions and when interpreting `fix_loop_results.md`.
 
-### Round 2 (incremental)
+### Round 2 — incremental review (after fixes on PR head)
 
-After fixes were pushed to PR #7 (new head `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea`, `updated_at 2026-05-13T10:32:29Z`), the round-2 snapshot under `pr7-round2/` shows:
+**PR head (API snapshot in `pr7-round2/pr_meta.json`):** `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea` · `updated_at`: `2026-05-13T10:32:29Z`
 
-- **Reviews on new head:** 0 (both `pr_reviews.json` entries still point at round-1 commit `5561aa5...`).
-- **Inline comments on new head:** 0 (all 7 still on `5561aa5...`).
-- **Incremental latency:** not measurable — no second review was published.
-- **New findings:** none.
-- **D4 status: still unmentioned** — the silent-overwrite blind spot persists into round 2 by default (no new review = no new chance to catch it).
-- **Merge-gating check:** none — no APPROVED / CHANGES_REQUESTED state recorded; both submissions remain `COMMENTED`.
+**Issue-comment timeline (CodeAnt bot):**
 
-**Read-out:** the "incremental review" did not actually occur on the new commit in this snapshot window. Either the bot was not re-triggered, the trigger fired but produced no diff-relevant findings, or the snapshot was taken before the second pass completed. For pilot purposes, treat "round 2 = silent" as a real outcome to investigate, not as evidence the fixes were accepted.
+| Milestone | UTC |
+|-----------|-----|
+| Incremental start | `2026-05-13T10:31:23Z` — “CodeAnt AI is running Incremental review” |
+| Incremental complete | `2026-05-13T10:32:29Z` — “CodeAnt AI Incremental review completed.” |
+
+**Incremental wall-clock (issue comments): ~66 seconds** from start → completed.
+
+**GitHub REST snapshot (`pr7-round2/`):**
+
+- `pulls/7/reviews`: still **2** CodeAnt reviews, both tied to original head **`5561aa5…`** (round 1); **no new review object** on `d7cb552…`.
+- `pulls/7/comments`: **7** inline threads from `codeant-ai[bot]`, all with **`commit_id` = `5561aa5…`** — **no new inline comments** anchored to the post-fix SHA in this export.
+
+**Interpretation:** CodeAnt’s incremental pass is visible in **issue comments** and completed quickly; the public API export does **not** show additional review rows or fresh inline threads on the new commit (threads remain on the prior diff; typical for “addressed” discussions unless the bot opens new ones).
+
+**D4:** Still not inferable from this snapshot alone; no new `session_management_service.rs` thread in REST data relative to round 1 set.
+
+**Merge gating:** Unchanged — reviews in export remain `COMMENTED` with empty body; confirm **Checks** tab on the PR for blocking signals.

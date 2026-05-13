@@ -1,5 +1,7 @@
 # Next steps after PR 1 scoring
 
+Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**.
+
 ## 1. Fix-me loop (PR #7)
 
 Goal: measure whether CodeAnt’s **“Fix in Cursor”** flow produces changes that pass your bar.

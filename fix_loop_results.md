@@ -1,7 +1,7 @@
-# Fix-me loop — Rexec PR [#7](https://github.com/vickky06/Rexec/pull/7) (local only)
+# Fix-me loop — Rexec PR [#7](https://github.com/vickky06/Rexec/pull/7)
 
-**Branch (local, not pushed):** `throwaway/fix-me-codeant` (from `pr7` @ `5561aa5`)  
-**Goal:** Apply minimal fixes aligned with CodeAnt’s top inline threads; verify `cargo check`.
+**Section below (local rehearsal):** branch `throwaway/fix-me-codeant` (from `pr7` @ `5561aa5`) — pre-push workflow validation.  
+**Round 2:** After fixes were **pushed** to the PR branch; see end of this file and `pr7-round2/`.
 
 ## Changes applied (maps to CodeAnt suggestions)
 
@@ -32,26 +32,20 @@ cargo check   → PASS (throwaway/fix-me-codeant, 2026-05-13)
 - To discard: `git checkout pr7 && git branch -D throwaway/fix-me-codeant`
 - To ship fixes: cherry-pick commits or re-apply on a real feature branch and open a new PR.
 
-## Round 2 — after push
-
-| Field | Value |
-|-------|-------|
-| PR head SHA after fixes | `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea` |
-| PR `updated_at` (API) | `2026-05-13T10:32:29Z` |
-| Round-2 artifact folder | [`pr7-round2/`](pr7-round2/) |
-
-**What CodeAnt did on the new head:** nothing observable. Both review submissions in `pr7-round2/pr_reviews.json` and all 7 inline comments in `pr7-round2/pr_inline_comments.json` are still attached to the round-1 commit `5561aa5ed69e4b305a26f951f1a4e5b305e4d78a`. No new inline threads, no new review state, no resolution events from the bot on `d7cb552`.
-
-**Incremental wall-clock:** N/A — no incremental review was submitted on the new SHA within the snapshot window.
-
-**Stale vs new (per `jq group_by commit_id`):**
-
-```text
-5561aa5ed69e4b305a26f951f1a4e5b305e4d78a	7
-```
-
-(i.e. 7 stale on round-1 SHA, 0 on round-2 SHA.)
-
 ## Security note
 
 Never paste GitHub PATs into chat or commit them. Use `export GH_TOKEN=...` only in your local shell or a secrets manager.
+
+---
+
+## Round 2 — after push (PR #7 head with fixes)
+
+**When:** CodeAnt incremental completed `2026-05-13T10:32:29Z` (see `pr7-round2/pr_issue_comments.json`).  
+**PR head (API):** `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea` (`pr7-round2/pr_meta.json`).  
+**Incremental duration (issue comments):** `10:31:23Z` → `10:32:29Z` ≈ **66 s**.
+
+**REST snapshot takeaway:** `pr7-round2/pr_reviews.json` still lists only the **two** round-1 reviews on **`5561aa5…`**; all **7** bot inline comments in `pr7-round2/pr_inline_comments.json` remain on **`5561aa5…`**. So: incremental run is **confirmed** on the conversation timeline, but this export shows **no new** pull-review rows or **new** inline threads on the post-fix commit (document for benchmark methodology — do not assume “no activity” means no analysis).
+
+**Artifacts:** `pr7-round2/*.json` · Runbook / checklist: `docs/PR7-ROUND2-EXECUTION-LOG.md`.
+
+Fixes on the branch aligned with the earlier local rehearsal (proto, executor error path, audit log shape, telemetry env gating, `force: true`); **D4** still a known CodeAnt blind spot from round 1.

@@ -33,12 +33,12 @@ Full analysis: **`PR2_CodeAnt_Score.md`** · Artifacts: **`pr8/*.json`**
 
 ## Scripts
 
-- **`fetch_rexec_pr.sh`** — `export GH_TOKEN=… && ./fetch_rexec_pr.sh <PR_NUMBER>` fetches Rexec PR JSON into `pr<N>/`.
+- **`fetch_rexec_pr.sh`** — `export GH_TOKEN=… && ./fetch_rexec_pr.sh <PR_NUMBER> [OUTPUT_DIR]` fetches Rexec PR JSON (default dir `pr<N>/`; e.g. `… 7 pr7-round2` for a second snapshot).
 - **`score_pr1.py`** — optional helper to build a human scoring template from inline comments.
 
 ## Fix-me loop (PR 7)
 
-Local experiment (not pushed): **`fix_loop_results.md`**.
+**`fix_loop_results.md`** — local rehearsal + **Round 2** (post-push) notes. API snapshot: **`pr7-round2/`** · Runbook: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**.
 
 ## Security
 
@@ -52,7 +52,7 @@ Local experiment (not pushed): **`fix_loop_results.md`**.
 
 ## What to do next
 
-See **`docs/NEXT-STEPS.md`** (merge gating, Bitbucket pilot).
+**`Plan.MD`** (checklist) · **`docs/NEXT-STEPS.md`** (merge gating, Bitbucket pilot) · PR #8 threads: **`docs/PR8-comments-inventory.md`**.
 
 ## License / data
 
