@@ -64,3 +64,23 @@ Use GitHub inline **“Fix in Cursor”** links on threads **3232323186** (D1), 
 ### Extra finding (outside six-defect answer key)
 
 Blocking `Command::new("curl").output()` inside async `cleanup_ports` — valid performance finding; not counted in the 20 weighted points.
+
+### Example: shape of the “Fix in Cursor” / agent handoff prompt
+
+**Finding:** The agent does not receive only the raw review sentence. It is wrapped in a **generic template** that repeats file path and line metadata, embeds the comment body, then appends **stock instructions** (validate, propose a concise fix, implement, scan other PR comments, optionally batch-fix the rest). That pattern is stable across threads and is closer to a **one-size-fits-all prompt** than a narrowly scoped edit request.
+
+**Example** (illustrative; line/column from PR snapshot; body matches D1 on `cleanup_service.rs`):
+
+```text
+This is a comment left during a code review.
+
+**Path:** src/services/helper_services/cleanup_service.rs
+**Line:** 14:15
+
+**Comment:**
+Security: A production bearer token is hardcoded in source code, which is a credential exposure risk and can be leaked via repository access, logs, or artifacts. Move this token to secure configuration (environment/secret manager) and load it at runtime.
+
+Validate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise. Once fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix
+```
+
+**Why it matters for the benchmark:** fix-me latency and edit quality reflect **template + comment + follow-up policy**, not the inline comment alone—useful when comparing vendors or Cursor versions and when interpreting `fix_loop_results.md`.
