@@ -15,15 +15,15 @@ Living checklist for the **vickky06/Rexec** PR benchmark and **codeant-benchmark
 - [x] **Fetch script** — `fetch_rexec_pr.sh` for reproducible GitHub API exports (`pr<N>/`).
 - [x] **Findings branch** — Pushed to [codeant-benchmark](https://github.com/vickky06/codeant-benchmark) on `docs/benchmark-findings-2026-05-13` (merge via open PR as needed).
 - [x] **Exploratory fix pass (manual)** — Documented in `fix_loop_results.md`: local branch `throwaway/fix-me-codeant` with D1/D2/D3/D5/D6-aligned edits and `cargo check` PASS. **Not** the canonical fix-me procedure (see below).
+- [x] **PR #7 round 2 (incremental) archived** — `pr7-round2/*.json`, narrative in `fix_loop_results.md` + `PR1_CodeAnt_Score.md`, runbook **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. *Optional:* stricter UI-per-thread timing still in **Remaining** below.
 
 ---
 
 ## Remaining
 
 - [ ] **Rotate credentials** — If any PAT was exposed, revoke it in GitHub and use a new token only via local `export GH_TOKEN=…` (never chat/commits).
-- [ ] **Merge benchmark PR** — Land `docs/benchmark-findings-2026-05-13` (or equivalent) so `main` contains scores + `pr8/`.
-- [ ] **Fix-me loop (UI-driven, measured)** — Re-run on PR #7 using the **GitHub PR web UI** fix entry point (see next section); record per-thread time, extra manual edits, and `cargo check` / `cargo clippy` / `cargo test` outcomes in `fix_loop_results.md` or a dated addendum.
-- [ ] **PR #7 round 2 (incremental) archived** — Follow **`docs/PR7-ROUND2-EXECUTION-LOG.md`** (fetch → `jq` → update `fix_loop_results.md` / `PR1_CodeAnt_Score.md` → push). Mark checkboxes there as you go.
+- [ ] **Merge benchmark PR** — Land `docs/benchmark-findings-2026-05-13` (or equivalent) so `main` contains scores + `pr8/` + `pr7-round2/`.
+- [ ] **Fix-me loop (UI-driven, measured)** — Optional rigor: re-run on PR #7 using **Fix in Cursor** per thread; record per-thread time and `cargo check` / `cargo clippy` / `cargo test` in `fix_loop_results.md` (fixes already landed on PR head for this bench).
 - [ ] **Merge gating** — Confirm whether CodeAnt (or GitHub App) exposes a **required check / commit status** suitable for branch protection; document gap if reviews stay `COMMENTED`-only.
 - [ ] **Bitbucket pilot** — Two-week pilot on a real service repo after security/egress sign-off (production is Bitbucket, not GitHub).
 - [ ] **Optional second vendor** — Same PR design vs CodeRabbit (or internal tool) for A/B comparison.

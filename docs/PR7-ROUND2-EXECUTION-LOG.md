@@ -1,146 +1,99 @@
 # PR #7 — CodeAnt round 2 (post-fix) — execution log
 
-Use this file as the **single checklist** for terminal work after your fixes are on the PR branch and CodeAnt has finished its **second / incremental** review. Check boxes as you go; we will update this document in-repo as steps complete.
-
 **PR:** https://github.com/vickky06/Rexec/pull/7  
-**Artifacts folder (round 2):** `pr7-round2/` (created by fetch below — avoids overwriting `pr8/` layout and keeps round 1 snapshots at repo root `pr1_*.json` untouched).
+**Artifacts folder:** `pr7-round2/` (committed in repo as of branch `docs/benchmark-findings-2026-05-13`).
+
+---
+
+## Repo verification (automated / filled)
+
+| Check | Status |
+|-------|--------|
+| `pr7-round2/pr_meta.json` present | Yes |
+| `pr7-round2/*.json` valid (4 files) | Yes |
+| `fix_loop_results.md` has **Round 2** section | Yes |
+| `PR1_CodeAnt_Score.md` has **Round 2 (incremental)** addendum | Yes |
 
 ---
 
 ## Preconditions
 
-- [x] Fixes pushed to PR #7 branch; CodeAnt shows **incremental / second review completed** on GitHub.
-- [ ] Pat exported only in shell: `export GH_TOKEN=…` (never committed, never pasted into chat).
+- [x] Fixes on PR #7 branch; CodeAnt incremental completed (issue comments in JSON).
+- [ ] PAT used only in local shell for fetch (`export GH_TOKEN=…`) — operational habit, not a repo artifact.
 
 ---
 
-## Step 1 — Open the benchmark repo
+## Steps (for reruns or other PRs)
+
+### Step 1 — Repo
 
 ```bash
 cd /path/to/codeant-benchmark
-git checkout docs/benchmark-findings-2026-05-13   # or your active findings branch
+git checkout docs/benchmark-findings-2026-05-13
 git pull
 ```
 
-- [ ] Done
+- [x] Done (for this benchmark branch)
 
----
-
-## Step 2 — Fetch GitHub API snapshots (round 2)
-
-Writes four JSON files under **`pr7-round2/`**.
+### Step 2 — Fetch
 
 ```bash
-export GH_TOKEN="your_token_here"
+export GH_TOKEN='…'
 ./fetch_rexec_pr.sh 7 pr7-round2
 ```
 
-- [ ] Done  
-- [ ] Confirmed no `message` / rate-limit errors in terminal (script exits 0).
+- [x] Done — `pr7-round2/` populated in repo
 
----
+### Step 3 — PR head (from `pr7-round2/pr_meta.json`)
 
-## Step 3 — Record PR head and timing anchors (fill in)
+| Field | Value |
+|-------|--------|
+| PR `head.sha` | `d7cb552b9e7d1ff72235c2b01379f2b0060d72ea` |
+| PR `updated_at` | `2026-05-13T10:32:29Z` |
 
-Run from `codeant-benchmark` root:
+### Step 4 — Incremental timeline (issue comments)
 
-```bash
-jq -r '.head.sha, .updated_at' pr7-round2/pr_meta.json
-```
+| Milestone | UTC |
+|-----------|-----|
+| “CodeAnt AI is running Incremental review” | `2026-05-13T10:31:23Z` |
+| “CodeAnt AI Incremental review completed.” | `2026-05-13T10:32:29Z` |
 
-| Field | Value (paste) |
-|-------|-----------------|
-| PR `head.sha` after your fixes | |
-| PR `updated_at` (API) | |
+**Wall-clock:** ~**66 seconds**.
 
-From GitHub **issue timeline** or PR **Conversation** tab, note (optional but best for write-up):
+### Step 5 — Metrics snapshot (`jq` on `pr7-round2/`)
 
-| Milestone | UTC timestamp |
-|-----------|----------------|
-| Your last fix push (commit on branch) | |
-| CodeAnt “Incremental review” start comment | |
-| CodeAnt “Incremental review completed” comment | |
+**CodeAnt `pulls/7/reviews` (bot only):** count **2** — both `commit_id` **`5561aa5ed69e4b305a26f951f1a4e5b305e4d78a`** (round 1 SHA).
 
-- [ ] Table filled (approximate times OK).
+**Inline comments (bot only):** total **7** — all grouped on **`5561aa5ed69e4b305a26f951f1a4e5b305e4d78a`** (none on `d7cb552…` in this export).
 
-**Incremental wall-clock (rough):** from “running incremental” → “completed” = ___ minutes ___ seconds.
+**New vs round 1 (REST):** No additional review submissions and no new inline threads on the post-fix head in `pr7-round2/*.json`; incremental completion is visible only via **issue comments** above.
 
----
+### Step 6 — Narrative docs
 
-## Step 4 — Summarize reviews and inline comments (`jq`)
+- [x] `fix_loop_results.md` — Round 2 subsection
+- [x] `PR1_CodeAnt_Score.md` — Round 2 incremental addendum
 
-```bash
-# List CodeAnt review submissions (id, state, commit_id, submitted_at)
-jq '[.[] | select(.user.login=="codeant-ai[bot]")] | .[] | {id, state, commit_id, submitted_at}' pr7-round2/pr_reviews.json
+### Step 7 — Push
 
-# Count inline review comments total vs by commit (if multiple SHAs appear)
-jq '[.[] | select(.user.login=="codeant-ai[bot]")] | length' pr7-round2/pr_inline_comments.json
+- [x] Pushed to `origin/docs/benchmark-findings-2026-05-13` (includes `pr7-round2/`)
 
-jq -r '[.[] | select(.user.login=="codeant-ai[bot]")] | group_by(.commit_id) | .[] | "\(.[0].commit_id)\t\(length)"' pr7-round2/pr_inline_comments.json
-```
-
-- [ ] Ran commands; pasted key counts into **Section “Metrics snapshot”** below.
-
----
-
-## Step 5 — Metrics snapshot (paste results — final doc will quote this)
-
-**CodeAnt `pulls/7/reviews` entries (bot only):** count ___
-
-**Inline comments (bot only):** total ___ — breakdown by `commit_id` (if any):
-
-```text
-(paste jq group_by output or short summary)
-```
-
-**New vs round 1:** (one sentence: e.g. “No new inline threads on head; only issue comment” or “N new threads on d7cb…”.)
-
-- [ ] Completed narrative.
-
----
-
-## Step 6 — Update narrative docs in this repo
-
-1. **`fix_loop_results.md`** — Add subsection **“Round 2 — after push”**: your branch name, head SHA, what CodeAnt did (new threads / resolved / none), incremental duration, link to `pr7-round2/`.
-2. **`PR1_CodeAnt_Score.md`** — Add short **addendum “Round 2 (incremental)”**: latency, whether new findings appeared, whether D4 still silent, merge-gating note if a **check** appeared on the PR.
-
-- [ ] `fix_loop_results.md` updated  
-- [ ] `PR1_CodeAnt_Score.md` updated (or separate `docs/PR7-round2-findings.md` if you prefer isolation)
-
----
-
-## Step 7 — Commit and push
-
-```bash
-git add pr7-round2 fix_loop_results.md PR1_CodeAnt_Score.md docs/PR7-ROUND2-EXECUTION-LOG.md fetch_rexec_pr.sh Plan.MD
-git status
-git commit -m "bench(PR7): round2 API artifacts, execution log, findings addendum"
-git push origin HEAD
-```
-
-- [ ] Pushed to remote findings branch.
-
----
-
-## Step 8 — Final concrete documentation (outline for later merge)
-
-When you merge the findings branch to `main` (or publish internally), the **final doc bundle** should include:
+### Step 8 — Merge / publish
 
 | Artifact | Role |
 |----------|------|
 | `PR1_CodeAnt_Score.md` | Round 1 + round 2 addendum |
 | `PR2_CodeAnt_Score.md` | Clean control (PR #8) |
 | `fix_loop_results.md` | Fix strategy + round 2 outcome |
-| `pr7-round2/*.json` | Reproducible API snapshot for round 2 |
+| `pr7-round2/*.json` | API snapshot after fixes |
 | `pr8/*.json` | Control arm snapshot |
-| `docs/PR8-comments-inventory.md` | **PR #8** — thread-level inventory (clean control; not part of PR #7 round 2 unless you re-push PR #8) |
-| `docs/PR7-ROUND2-EXECUTION-LOG.md` | This runbook (checklist + provenance) |
-| `Plan.MD` | Overall plan / completed vs remaining |
+| `docs/PR8-comments-inventory.md` | PR #8 thread inventory |
+| `docs/PR7-ROUND2-EXECUTION-LOG.md` | This runbook |
+| `Plan.MD` | Overall plan |
 
-- [ ] Findings PR on GitHub updated / merged as appropriate.
+- [ ] **Merge** findings branch to `main` (or close PR) when you are ready — only remaining **repo** gate for “documentation final.”
 
 ---
 
 ## For the assistant (Cursor)
 
-When the user says **“Step N done”**, mark the matching `- [ ]` → `- [x]` in this file via a commit, and fold any pasted metrics into **Section 5** and related docs so the log becomes the **authoritative timeline** for the final write-up.
+On user request, mark **Step 8** done after merge, and update `Plan.MD` **Completed** section.
