@@ -1,5 +1,7 @@
 # Next steps after PR 1 scoring
 
+Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**.
+
 ## 1. Fix-me loop (PR #7)
 
 Goal: measure whether CodeAnt’s **“Fix in Cursor”** flow produces changes that pass your bar.
@@ -21,9 +23,9 @@ Goal: measure whether CodeAnt’s **“Fix in Cursor”** flow produces changes 
 
 ## 2. PR 2 (clean control)
 
-- Push branch `feat/max-code-length-validation` and open a PR against `main` (see `docs/PR2-clean-control-spec.md`).
-- Re-run artifact capture with the **new PR number** (duplicate `score_pr1.sh` logic or edit paths).
-- Compare **warm** review latency to PR 1’s **cold** ~9 minutes.
+- **PR:** https://github.com/vickky06/Rexec/pull/8
+- From repo root: `export GH_TOKEN=… && ./fetch_rexec_pr.sh 8` → saves under `pr8/`.
+- After CodeAnt finishes: score **false positives**, **noise**, **summary quality**, and **warm latency** vs PR 1’s **cold** ~9 minutes (see `docs/PR2-clean-control-spec.md`).
 
 ## 3. Merge gating (“bot as shield”)
 
