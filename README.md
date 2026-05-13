@@ -27,8 +27,9 @@ Full analysis: **`PR1_CodeAnt_Score.md`**
 
 ## Clean control (PR 2)
 
-Specification and scoring plan: **`docs/PR2-clean-control-spec.md`**.  
-Implementation lives on Rexec branch `feat/max-code-length-validation` (push and open PR when ready).
+- **PR:** [#8 — max code length validation](https://github.com/vickky06/Rexec/pull/8) (Rexec)
+- **Spec / scoring:** **`docs/PR2-clean-control-spec.md`**
+- **Artifacts:** run `export GH_TOKEN=… && ./fetch_rexec_pr.sh 8` — writes `pr8/*.json`
 
 ## What to do next
 

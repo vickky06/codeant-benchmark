@@ -4,6 +4,8 @@
 
 **Target repo:** [vickky06/Rexec](https://github.com/vickky06/Rexec)
 
+**Opened PR:** https://github.com/vickky06/Rexec/pull/8
+
 ## Branch (local / to push)
 
 - **Branch name:** `feat/max-code-length-validation`
