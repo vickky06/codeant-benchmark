@@ -1,0 +1,140 @@
+[
+  {
+    "url": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270422",
+    "pull_request_review_id": 4280482212,
+    "id": 3233270422,
+    "node_id": "PRRC_kwDOOkPwb87At8qW",
+    "diff_hunk": "@@ -43,6 +43,7 @@ pub struct SessionConfigs {\n     pub session_timeout: u64,\n     pub session_cleanup_interval: u64,\n     pub max_sessions: usize,\n+    pub max_code_length: usize,",
+    "path": "src/models/config_models.rs",
+    "commit_id": "0576b535964a97963b6920bfe43fbdde34038a66",
+    "original_commit_id": "0576b535964a97963b6920bfe43fbdde34038a66",
+    "user": {
+      "login": "codeant-ai[bot]",
+      "id": 151821869,
+      "node_id": "BOT_kgDOCQyeLQ",
+      "avatar_url": "https://avatars.githubusercontent.com/in/646884?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/codeant-ai%5Bbot%5D",
+      "html_url": "https://github.com/apps/codeant-ai",
+      "followers_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "**Suggestion:** `max_code_length` is now a required TOML field with no serde default, so any environment still using an older `config.toml` will fail at startup when `Config::new()` parses the file. This is a runtime-breaking config contract change; add a serde default (or make the field optional with fallback) so missing values still resolve to the documented default. [api mismatch]\n\n<details>\n<summary><b>Severity Level:</b> Critical 🚨</summary>\n\n```mdx\n- ❌ gRPC server fails to start with older config.toml.\n- ❌ WebSocket server never starts when config parse panics.\n- ⚠️ Deployment requires manual config migration for new field.\n```\n</details>\n<details>\n<summary><b>Steps of Reproduction ✅ </b></summary>\n\n```mdx\n1. Observe in `src/models/config_models.rs:42-47` that `SessionConfigs` has only\nnon-optional, non-default fields: `session_timeout`, `session_cleanup_interval`,\n`max_sessions`, and the new `max_code_length: usize`.\n\n2. See in `src/services/helper_services/config_service.rs:19-25` that `Config::new()`\nreads `CONFIG_FILE` (`config.toml`) and deserializes it with `toml::from_str(&content)`\ndirectly into `Config`, which embeds `SessionConfigs`, and then calls `.expect(\"Failed to\nparse config file\")`.\n\n3. Note that `SessionConfigs` and `Config` have no `#[serde(default)]` attributes and\n`max_code_length` is not an `Option`, so per serde/toml semantics a `config.toml` missing\n`session_configs.max_code_length` causes `toml::from_str` to return an `Err` during\n`Config` deserialization.\n\n4. Run the binary (e.g., `cargo run -- run`) in an environment where the existing\n`config.toml` predates this PR and omits `session_configs.max_code_length`;\n`Config::new()` in `src/main.rs:47-52` will invoke `Config::new()`, `toml::from_str` will\nfail due to the missing field, `expect(\"Failed to parse config file\")` will panic, and the\nprocess will terminate before `set_global_config(config)` and server startup.\n```\n</details>\n\n[Fix in Cursor](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt=This%20is%20a%20comment%20left%20during%20a%20code%20review.%0A%0A%2A%2APath%3A%2A%2A%20src%2Fmodels%2Fconfig_models.rs%0A%2A%2ALine%3A%2A%2A%2046%3A46%0A%2A%2AComment%3A%2A%2A%0A%09%2AApi%20Mismatch%3A%20%60max_code_length%60%20is%20now%20a%20required%20TOML%20field%20with%20no%20serde%20default%2C%20so%20any%20environment%20still%20using%20an%20older%20%60config.toml%60%20will%20fail%20at%20startup%20when%20%60Config%3A%3Anew%28%29%60%20parses%20the%20file.%20This%20is%20a%20runtime-breaking%20config%20contract%20change%3B%20add%20a%20serde%20default%20%28or%20make%20the%20field%20optional%20with%20fallback%29%20so%20missing%20values%20still%20resolve%20to%20the%20documented%20default.%0A%0AValidate%20the%20correctness%20of%20the%20flagged%20issue.%20If%20correct%2C%20How%20can%20I%20resolve%20this%3F%20If%20you%20propose%20a%20fix%2C%20implement%20it%20and%20please%20make%20it%20concise.%0AOnce%20fix%20is%20implemented%2C%20also%20check%20other%20comments%20on%20the%20same%20PR%2C%20and%20ask%20user%20if%20the%20user%20wants%20to%20fix%20the%20rest%20of%20the%20comments%20as%20well.%20if%20said%20yes%2C%20then%20fetch%20all%20the%20comments%20validate%20the%20correctness%20and%20implement%20a%20minimal%20fix%0A) | [Fix in VSCode Claude](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt=This%20is%20a%20comment%20left%20during%20a%20code%20review.%0A%0A%2A%2APath%3A%2A%2A%20src%2Fmodels%2Fconfig_models.rs%0A%2A%2ALine%3A%2A%2A%2046%3A46%0A%2A%2AComment%3A%2A%2A%0A%09%2AApi%20Mismatch%3A%20%60max_code_length%60%20is%20now%20a%20required%20TOML%20field%20with%20no%20serde%20default%2C%20so%20any%20environment%20still%20using%20an%20older%20%60config.toml%60%20will%20fail%20at%20startup%20when%20%60Config%3A%3Anew%28%29%60%20parses%20the%20file.%20This%20is%20a%20runtime-breaking%20config%20contract%20change%3B%20add%20a%20serde%20default%20%28or%20make%20the%20field%20optional%20with%20fallback%29%20so%20missing%20values%20still%20resolve%20to%20the%20documented%20default.%0A%0AValidate%20the%20correctness%20of%20the%20flagged%20issue.%20If%20correct%2C%20How%20can%20I%20resolve%20this%3F%20If%20you%20propose%20a%20fix%2C%20implement%20it%20and%20please%20make%20it%20concise.%0AOnce%20fix%20is%20implemented%2C%20also%20check%20other%20comments%20on%20the%20same%20PR%2C%20and%20ask%20user%20if%20the%20user%20wants%20to%20fix%20the%20rest%20of%20the%20comments%20as%20well.%20if%20said%20yes%2C%20then%20fetch%20all%20the%20comments%20validate%20the%20correctness%20and%20implement%20a%20minimal%20fix%0A)\n\n*(Use Cmd/Ctrl + Click for best experience)*\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** src/models/config_models.rs\n**Line:** 46:46\n**Comment:**\n\t*Api Mismatch: `max_code_length` is now a required TOML field with no serde default, so any environment still using an older `config.toml` will fail at startup when `Config::new()` parses the file. This is a runtime-breaking config contract change; add a serde default (or make the field optional with fallback) so missing values still resolve to the documented default.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2Fvickky06%2FRexec%2Fpull%2F8&comment_hash=e8d27e33b526c3919a7939586b7725ddff2588121b3a0593a07889fa368f4811&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2Fvickky06%2FRexec%2Fpull%2F8&comment_hash=e8d27e33b526c3919a7939586b7725ddff2588121b3a0593a07889fa368f4811&reaction=dislike'>👎</a>",
+    "created_at": "2026-05-13T10:06:08Z",
+    "updated_at": "2026-05-13T10:06:08Z",
+    "html_url": "https://github.com/vickky06/Rexec/pull/8#discussion_r3233270422",
+    "pull_request_url": "https://api.github.com/repos/vickky06/Rexec/pulls/8",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270422"
+      },
+      "html": {
+        "href": "https://github.com/vickky06/Rexec/pull/8#discussion_r3233270422"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/vickky06/Rexec/pulls/8"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270422/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 46,
+    "original_line": 46,
+    "side": "RIGHT",
+    "author_association": "NONE",
+    "original_position": 4,
+    "position": 4,
+    "subject_type": "line"
+  },
+  {
+    "url": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270432",
+    "pull_request_review_id": 4280482212,
+    "id": 3233270432,
+    "node_id": "PRRC_kwDOOkPwb87At8qg",
+    "diff_hunk": "@@ -100,6 +103,17 @@ impl ValidationService {\n             return Err(ValidationError::EmptyCode());\n         }\n \n+        let max_code_length = get_global_config(|config| config.clone())\n+            .await\n+            .session_configs\n+            .max_code_length;",
+    "path": "src/services/validation_services/request_validation/validation_service.rs",
+    "commit_id": "0576b535964a97963b6920bfe43fbdde34038a66",
+    "original_commit_id": "0576b535964a97963b6920bfe43fbdde34038a66",
+    "user": {
+      "login": "codeant-ai[bot]",
+      "id": 151821869,
+      "node_id": "BOT_kgDOCQyeLQ",
+      "avatar_url": "https://avatars.githubusercontent.com/in/646884?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/codeant-ai%5Bbot%5D",
+      "html_url": "https://github.com/apps/codeant-ai",
+      "followers_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/codeant-ai%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "**Suggestion:** This adds a second `get_global_config(...).await` + full config clone inside request validation, even though the same function already acquires global config earlier. Under load, this introduces avoidable mutex contention and extra cloning on every request; fetch the needed value from the existing config read (or cache it once) to avoid hot-path serialization. [performance]\n\n<details>\n<summary><b>Severity Level:</b> Major ⚠️</summary>\n\n```mdx\n- ❌ Each ExecuteRequest locks global config mutex twice.\n- ⚠️ Extra Config clone per request increases CPU usage.\n- ⚠️ High-throughput workloads see avoidable latency overhead.\n```\n</details>\n<details>\n<summary><b>Steps of Reproduction ✅ </b></summary>\n\n```mdx\n1. Start the service via `main()` in `src/main.rs:35-52`, which constructs a `Config`\nusing `Config::new()`, calls `config.init()`, and registers it globally with\n`set_global_config(config)` from `src/services/helper_services/config_service.rs:66-69`.\n\n2. Send a gRPC `ExecuteRequest` to the `CodeExecutor::execute` method implemented in\n`src/services/execution_services/executor_service.rs:18-23`; this method immediately calls\n`ValidationService::validate_request(&request).await` at line 24.\n\n3. Inside `ValidationService::validate_request`\n(`src/services/validation_services/request_validation/validation_service.rs:61-80`),\nobserve the first call to `get_global_config(|config| config.clone())` at lines 65-67,\nwhich locks `GLOBAL_CONFIG` (see `get_global_config` implementation at\n`config_service.rs:47-57`), clones the entire `Config`, and uses the cloned\n`session_management_service` to extract the session ID from the request.\n\n4. In the same function, after language and empty-code checks, observe the second call at\nlines 106-109: `let max_code_length = get_global_config(|config|\nconfig.clone()).await.session_configs.max_code_length;`, which again locks the same global\n`Mutex<Config>` and clones the full `Config` just to access\n`session_configs.max_code_length`, meaning every incoming `ExecuteRequest` performs two\nglobal-mutex locks and two full `Config` clones on the validation hot path instead of\nreusing the earlier config read or caching the needed value.\n```\n</details>\n\n[Fix in Cursor](https://app.codeant.ai/fix-in-ide?tool=cursor&prompt=This%20is%20a%20comment%20left%20during%20a%20code%20review.%0A%0A%2A%2APath%3A%2A%2A%20src%2Fservices%2Fvalidation_services%2Frequest_validation%2Fvalidation_service.rs%0A%2A%2ALine%3A%2A%2A%20106%3A109%0A%2A%2AComment%3A%2A%2A%0A%09%2APerformance%3A%20This%20adds%20a%20second%20%60get_global_config%28...%29.await%60%20%2B%20full%20config%20clone%20inside%20request%20validation%2C%20even%20though%20the%20same%20function%20already%20acquires%20global%20config%20earlier.%20Under%20load%2C%20this%20introduces%20avoidable%20mutex%20contention%20and%20extra%20cloning%20on%20every%20request%3B%20fetch%20the%20needed%20value%20from%20the%20existing%20config%20read%20%28or%20cache%20it%20once%29%20to%20avoid%20hot-path%20serialization.%0A%0AValidate%20the%20correctness%20of%20the%20flagged%20issue.%20If%20correct%2C%20How%20can%20I%20resolve%20this%3F%20If%20you%20propose%20a%20fix%2C%20implement%20it%20and%20please%20make%20it%20concise.%0AOnce%20fix%20is%20implemented%2C%20also%20check%20other%20comments%20on%20the%20same%20PR%2C%20and%20ask%20user%20if%20the%20user%20wants%20to%20fix%20the%20rest%20of%20the%20comments%20as%20well.%20if%20said%20yes%2C%20then%20fetch%20all%20the%20comments%20validate%20the%20correctness%20and%20implement%20a%20minimal%20fix%0A) | [Fix in VSCode Claude](https://app.codeant.ai/fix-in-ide?tool=vscode-claude&prompt=This%20is%20a%20comment%20left%20during%20a%20code%20review.%0A%0A%2A%2APath%3A%2A%2A%20src%2Fservices%2Fvalidation_services%2Frequest_validation%2Fvalidation_service.rs%0A%2A%2ALine%3A%2A%2A%20106%3A109%0A%2A%2AComment%3A%2A%2A%0A%09%2APerformance%3A%20This%20adds%20a%20second%20%60get_global_config%28...%29.await%60%20%2B%20full%20config%20clone%20inside%20request%20validation%2C%20even%20though%20the%20same%20function%20already%20acquires%20global%20config%20earlier.%20Under%20load%2C%20this%20introduces%20avoidable%20mutex%20contention%20and%20extra%20cloning%20on%20every%20request%3B%20fetch%20the%20needed%20value%20from%20the%20existing%20config%20read%20%28or%20cache%20it%20once%29%20to%20avoid%20hot-path%20serialization.%0A%0AValidate%20the%20correctness%20of%20the%20flagged%20issue.%20If%20correct%2C%20How%20can%20I%20resolve%20this%3F%20If%20you%20propose%20a%20fix%2C%20implement%20it%20and%20please%20make%20it%20concise.%0AOnce%20fix%20is%20implemented%2C%20also%20check%20other%20comments%20on%20the%20same%20PR%2C%20and%20ask%20user%20if%20the%20user%20wants%20to%20fix%20the%20rest%20of%20the%20comments%20as%20well.%20if%20said%20yes%2C%20then%20fetch%20all%20the%20comments%20validate%20the%20correctness%20and%20implement%20a%20minimal%20fix%0A)\n\n*(Use Cmd/Ctrl + Click for best experience)*\n<details>\n<summary><b>Prompt for AI Agent 🤖 </b></summary>\n\n```mdx\nThis is a comment left during a code review.\n\n**Path:** src/services/validation_services/request_validation/validation_service.rs\n**Line:** 106:109\n**Comment:**\n\t*Performance: This adds a second `get_global_config(...).await` + full config clone inside request validation, even though the same function already acquires global config earlier. Under load, this introduces avoidable mutex contention and extra cloning on every request; fetch the needed value from the existing config read (or cache it once) to avoid hot-path serialization.\n\nValidate the correctness of the flagged issue. If correct, How can I resolve this? If you propose a fix, implement it and please make it concise.\nOnce fix is implemented, also check other comments on the same PR, and ask user if the user wants to fix the rest of the comments as well. if said yes, then fetch all the comments validate the correctness and implement a minimal fix\n```\n</details>\n<a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2Fvickky06%2FRexec%2Fpull%2F8&comment_hash=f383a0c12c25c1b56fbf7bc72b0acc9bcc55ca1fb33cebcf1e01a1ecebc71ca5&reaction=like'>👍</a> | <a href='https://app.codeant.ai/feedback?pr_url=https%3A%2F%2Fgithub.com%2Fvickky06%2FRexec%2Fpull%2F8&comment_hash=f383a0c12c25c1b56fbf7bc72b0acc9bcc55ca1fb33cebcf1e01a1ecebc71ca5&reaction=dislike'>👎</a>",
+    "created_at": "2026-05-13T10:06:08Z",
+    "updated_at": "2026-05-13T10:06:08Z",
+    "html_url": "https://github.com/vickky06/Rexec/pull/8#discussion_r3233270432",
+    "pull_request_url": "https://api.github.com/repos/vickky06/Rexec/pulls/8",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270432"
+      },
+      "html": {
+        "href": "https://github.com/vickky06/Rexec/pull/8#discussion_r3233270432"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/vickky06/Rexec/pulls/8"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/vickky06/Rexec/pulls/comments/3233270432/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": 106,
+    "original_start_line": 106,
+    "start_side": "RIGHT",
+    "line": 109,
+    "original_line": 109,
+    "side": "RIGHT",
+    "author_association": "NONE",
+    "original_position": 17,
+    "position": 17,
+    "subject_type": "line"
+  }
+]

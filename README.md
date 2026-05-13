@@ -20,20 +20,39 @@ This repository holds **reproducible artifacts** and **scored findings** for eva
 
 Full analysis: **`PR1_CodeAnt_Score.md`**
 
+## Results (PR 2 — clean control)
+
+| Metric | Value |
+|--------|--------|
+| False positives (inline) | **0** |
+| Noise | **0** |
+| Inline file coverage | **50%** (2 / 4 files) |
+| Warm review latency | **~4 min 13 s** |
+
+Full analysis: **`PR2_CodeAnt_Score.md`** · Artifacts: **`pr8/*.json`**
+
 ## Scripts
 
-- **`score_pr1.sh`** — fetch PR JSON from GitHub (`export GH_TOKEN=…` required for private or rate-limited use).
+- **`fetch_rexec_pr.sh`** — `export GH_TOKEN=… && ./fetch_rexec_pr.sh <PR_NUMBER>` fetches Rexec PR JSON into `pr<N>/`.
 - **`score_pr1.py`** — optional helper to build a human scoring template from inline comments.
+
+## Fix-me loop (PR 7)
+
+Local experiment (not pushed): **`fix_loop_results.md`**.
+
+## Security
+
+**Never commit GitHub PATs** or paste them into chat. If a PAT was exposed, **revoke it** in GitHub → Settings → Developer settings → Personal access tokens, then create a new one.
 
 ## Clean control (PR 2)
 
 - **PR:** [#8 — max code length validation](https://github.com/vickky06/Rexec/pull/8) (Rexec)
-- **Spec / scoring:** **`docs/PR2-clean-control-spec.md`**
-- **Artifacts:** run `export GH_TOKEN=… && ./fetch_rexec_pr.sh 8` — writes `pr8/*.json`
+- **Spec:** **`docs/PR2-clean-control-spec.md`**
+- **Artifacts:** `pr8/` (see `fetch_rexec_pr.sh`)
 
 ## What to do next
 
-See **`docs/NEXT-STEPS.md`** (fix-me loop, PR 2, merge gating, Bitbucket pilot).
+See **`docs/NEXT-STEPS.md`** (merge gating, Bitbucket pilot).
 
 ## License / data
 
