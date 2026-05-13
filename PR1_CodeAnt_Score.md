@@ -1,0 +1,36 @@
+# CodeAnt PR 1 — Scored Report
+
+PR: https://github.com/vickky06/Rexec/pull/7
+Files changed: 5
+
+## Recall by defect
+
+| ID | Dimension | Weight | Verdict | Credit | Evidence (quoted) |
+|----|-----------|--------|---------|--------|-------------------|
+| D1 | Security         | 5 | CAUGHT  | 5 | "A production bearer token is hardcoded in source code, which is a credential exposure risk and can be leaked via repository access, logs, or artifacts. Move this token to secure configuration (environment/secret manager) and load it at runtime." (cleanup_service.rs:15) — also reinforced by Architect Review: "A live telemetry bearer token is hardcoded in source (TELEMETRY_TOKEN) and used directly as the Authorization header, creating an immediate credential exposure..." |
+| D2 | Observability    | 3 | CAUGHT  | 3 | "Logging full inbound WebSocket payloads writes user-submitted code/content directly to audit logs, which can leak sensitive data and secrets from requests. Log only metadata (request id, session id, size, hash) or redact payload contents before logging." (websocket_server.rs:49) |
+| D3 | Compatibility    | 5 | CAUGHT  | 5 | "Renumbering an existing protobuf field changes the wire contract and breaks backward compatibility with clients still sending the old field number. Requests from older clients will decode with an empty code payload, causing validation/execution failures. Keep the original tag for existing fields and only use new tag numbers for truly new fields." (executor.proto:11) |
+| D4 | Resource         | 3 | MISSED  | 0 | no relevant comment |
+| D5 | Correctness      | 2 | CAUGHT  | 2 | "Returning success with an empty string on container execution failure hides real runtime errors and prevents recovery logic from running. This makes failed executions look successful to callers and can silently drop user output. Propagate the error instead of converting it to an empty successful response." (executor_service.rs:81) |
+| D6 | Failure-handling | 2 | CAUGHT  | 2 | "Container cleanup now uses non-forced removal, but this cleanup path iterates active containers; Docker will reject removing running containers without force, causing cleanup to fail and leaving stale resources behind. Either stop containers first or keep forced removal where this path expects guaranteed cleanup." (cleanup_service.rs:85) |
+
+**Total caught: 17 / 20  =>  Recall: 85 %**
+
+## Other metrics
+- False positives: 0
+- Noise (style/nit on correct code): 0
+- Summary quality (1-5): 1   (The "CodeAnt-AI Description" uncritically echoes the cover story, framing all six seeded defects — including the hardcoded production token, raw-payload audit logging, wire-breaking proto renumber, silent overwrite, swallowed error, and weakened cleanup — as positive improvements complete with ✅ "Impact" bullets; no risk callouts in the summary itself.)
+- Coverage: 80 %  (4 distinct files commented / 5)
+- Verdict signal: COMMENTED  (both review submissions in pr1_reviews.json have `state: "COMMENTED"`; no APPROVED/CHANGES_REQUESTED status was published)
+
+## False positives detail
+None.
+
+## Notable observations
+- Strong, specific findings on 5 of 6 defects with actionable remediation and reproduction steps — D1, D2, D3, D5, D6 all caught at full credit with verbatim identification of the seeded issue (e.g., explicit "wire contract" language for D3, "Bearer rxc_live_..." token quoted for D1).
+- Complete blind spot on D4: zero comments on `src/services/all_session_services/session_management_service.rs`. The removal of the `sessions.contains_key` guard — which silently overwrites and orphans a previously tracked container reference on reconnect — was not flagged at any severity, and the file itself drew no review attention.
+- One additional legitimate finding beyond the seed set: the synchronous `Command::new("curl").output()` inside an async `cleanup_ports` (cleanup_service.rs:160) was correctly flagged as a blocking-in-async performance issue. Not a seeded defect, but a real concern — credit for going beyond the answer key.
+- Striking disconnect between the inline review (rigorous, evidence-based, catches Critical/Major bugs) and the PR-level summary (parrots the author's misleading "telemetry/audit/UX improvements" framing and labels the same code with ✅ checkmarks). A reviewer or release manager skimming only the summary would conclude this PR is safe to merge.
+
+## One-line judgment
+Yes — proceed to a Bitbucket pilot: 85% weighted recall with zero false positives and zero noise is strong inline-review performance, but the pilot must specifically test (a) whether D4-class silent-overwrite/resource-leak defects are systematically missed, and (b) whether the summary layer can be configured to inherit severity from inline findings rather than restating the author's cover story.
