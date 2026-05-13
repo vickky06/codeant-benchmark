@@ -34,3 +34,33 @@ None.
 
 ## One-line judgment
 Yes — proceed to a Bitbucket pilot: 85% weighted recall with zero false positives and zero noise is strong inline-review performance, but the pilot must specifically test (a) whether D4-class silent-overwrite/resource-leak defects are systematically missed, and (b) whether the summary layer can be configured to inherit severity from inline findings rather than restating the author's cover story.
+
+---
+
+## Addendum — timeline, artifacts, and fix-me (2026-05-13)
+
+### Timeline (UTC)
+
+| Milestone | Time |
+|-----------|------|
+| PR opened | `2026-05-13T07:21:43Z` |
+| CodeAnt “reviewing” | `2026-05-13T07:21:47Z` |
+| First review submitted | `2026-05-13T07:30:09Z` |
+| Second review submitted | `2026-05-13T07:30:54Z` |
+| “Finished reviewing” | `2026-05-13T07:30:58Z` (~**9.2 min** cold latency) |
+
+### Artifacts in this repo
+
+JSON snapshots and scripts used for scoring live alongside this file: `pr1_meta.json`, `pr1_inline_comments.json`, `pr1_reviews.json`, `pr1_issue_comments.json`, `score_pr1.sh`, `score_template.md`, `Rexec_PR1_AnswerKey.md`.
+
+### Summary vs inline (reconciled)
+
+If the numeric “Summary quality” above differs from narrative here: treat **inline comments as ground truth** for recall; the **CodeAnt-AI Description** block in `pr1_meta.body` can still read as promotional. For shield workflows, do not treat the summary alone as a pass signal.
+
+### Fix-me loop (not run in benchmark repo)
+
+Use GitHub inline **“Fix in Cursor”** links on threads **3232323186** (D1), **3232323170** (D3), **3232323179** (D5). Full procedure: [docs/NEXT-STEPS.md](docs/NEXT-STEPS.md).
+
+### Extra finding (outside six-defect answer key)
+
+Blocking `Command::new("curl").output()` inside async `cleanup_ports` — valid performance finding; not counted in the 20 weighted points.
