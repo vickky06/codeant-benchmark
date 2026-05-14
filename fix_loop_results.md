@@ -56,7 +56,7 @@ Fixes on the branch aligned with the earlier local rehearsal (proto, executor er
 
 The three-arm Go benchmark (uber-eats, rate-limiter, ride-sharing) ran its own fix loop. Methodology differs from the Rexec UI-driven plan in `Plan.MD:33-62`:
 
-- **Tool used:** Claude assistant, **not CodeAnt's "Fix in Cursor"** button (403 quota blocked the latter on rideSharingApp; Uber-Eats / Rate-Limiter were done with Claude for consistency).
+- **Tool used:** mix of CodeAnt's **"Fix in Cursor"** button (early iterations within the session — **confirmed working**; produced actionable diffs) and a Claude assistant (later iterations, after hitting a free-tier **403** quota mid-session). The fix-in-cursor path was not what failed — the rate limit was. Per-thread Fix-in-Cursor wall-clocks were not recorded; bundled per-PR commits used.
 - **Commit style:** one bundled commit per PR, not per-thread commits.
 - **What is measured:** fix-correctness (8/8 CodeAnt-flagged findings addressed, all `go build / vet / test / test -race` clean).
 - **What is not measured:** CodeAnt's own Fix-in-Cursor suggestion quality, per-thread UI-driven wall-clock vs adoption-band thresholds.

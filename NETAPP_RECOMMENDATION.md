@@ -161,9 +161,9 @@ Using PR commit timestamps as a proxy (R1-finish → fix-commit pushed; full per
 | Tolerated (like a slow CI check) | 1–3 min / thread | None |
 | **Kills adoption** | > 5 min / thread | **2 of 3 PRs (Uber-Eats 6m 51s, Rate-Limiter 5m 20s); Ride-Sharing 4m 50s just below** |
 
-Caveats: the wall-clock proxy includes context-switches, side-conversations (Claude assistant was used), verification, and push — it is an upper bound on the developer's pure fix-edit time, *and* a lower bound on what a developer without LLM assistance would take. Despite caveats, the band placement is unambiguous: **median fix-loop session lands above the adoption-killing 5-minute threshold.** Full methodology in `fix_loop_results_go_addendum.md`.
+Caveats: the wall-clock proxy includes context-switches, side-conversations, verification, and push — it is an upper bound on the developer's pure fix-edit time. Fixes were applied via a **mix** of CodeAnt's Fix-in-Cursor button (early iterations within the session — confirmed working) and a Claude assistant (later iterations, after a free-tier 403 quota cut off Fix-in-Cursor). Despite caveats, the band placement is unambiguous: **median fix-loop session lands above the adoption-killing 5-minute threshold.** Full methodology in `fix_loop_results_go_addendum.md`.
 
-**Implication for the manual-gate recommendation:** even if the manual-gate UX problems in Section 5 were fixed, the per-thread cost of acting on a CodeAnt finding is above the adoption band that empirical product-adoption studies place as the developer-tolerance ceiling. The advisory-mode pilot in Section 10 must explicitly budget this cost, and developers should be expected to push back within one or two sprints if the rate isn't materially reduced by CodeAnt's own Fix-in-Cursor UX (which we have not yet measured).
+**Implication for the manual-gate recommendation:** even if the manual-gate UX problems in Section 5 were fixed, the per-thread cost of acting on a CodeAnt finding is above the adoption band that empirical product-adoption studies place as the developer-tolerance ceiling. The advisory-mode pilot in Section 10 must explicitly budget this cost, and developers should be expected to push back within one or two sprints if Fix-in-Cursor's *isolated* per-thread wall-clock does not materially come in below this mixed-assistance proxy — a number we couldn't isolate here before the free-tier 403 quota cut off Fix-in-Cursor mid-session.
 
 ## 9. Outstanding measurements
 
@@ -171,7 +171,7 @@ The recommendation in this document is supported by the data gathered here, but 
 
 | Gap | Why it matters |
 |---|---|
-| **UI-driven Fix-in-Cursor wall-clock (CodeAnt-product surface)** | The runbook (`docs/Go-Fix-Loop-Runbook.md`) prescribed per-thread timing via Cursor's Fix-in-Cursor button. The actual fix loop used a Claude assistant — fix-correctness measured (12/12 addressed), but the pure-CodeAnt-UX wall-clock is not. We **do** have a wall-clock proxy from PR commit timestamps (see below); CodeAnt's own product surface remains unmeasured. |
+| **Per-thread Fix-in-Cursor wall-clock (isolated)** | Fix-in-Cursor **was used and works** — exercised early in the fix loop, produced actionable diffs. A free-tier 403 quota cut it off after multiple iterations, and the remainder completed with a Claude assistant. We have a per-PR wall-clock proxy (see §8.1) but not isolated per-thread Fix-in-Cursor timings. Worth re-running on a paid tier to isolate the Fix-in-Cursor UX number specifically. |
 | **Java behavior** | NetApp's web tier is Java. Zero Java tested here. CodeAnt's class-based blind spots may differ on Java (Maven / Spring / annotation-driven code). |
 | **NetApp-scale codebase behavior** | This benchmark tested 4 PRs against ~5K LOC repos. NetApp's control plane is orders of magnitude larger. CodeAnt's cross-file analysis, dependency tracking, and PR queue behavior at scale are unknown. |
 | **Historical-replay recall** | The gold-standard test — *did CodeAnt catch defects that escaped human review and required post-merge bugfixes?* — was not run. Would require a Go repo with merged PRs + post-merge bugfix commits. |
@@ -188,7 +188,7 @@ For each gap, see the corresponding sections in `docs/Go-Corpus-Design.md` and `
 | **Adopt as branch-protection blocking gate?** | **No** | No required-check / commit-status mechanism observed; PR reviews stay `COMMENTED` only. Plus class-based blind spots are gate-breaking. |
 | **Adopt as advisory first-pass alongside human review?** | **Yes, with Section 8 rules** | Decision-grade evidence of value-add on concurrency, secrets, PII, off-by-one. Cost = the operational rules in Section 8 + a Java baseline before extending beyond Go. |
 | **Adopt as PR summarizer / triage tool?** | **No** | Summary regression is consistent. The summary endorses defects. Use inline comments only. |
-| **Adopt as fix-suggestion tool (Fix-in-Cursor)?** | **Undetermined** | Not measured. The text-of-suggestion produced actionable fixes when consumed by an LLM assistant; CodeAnt's own Fix-in-Cursor product output was never exercised. |
+| **Adopt as fix-suggestion tool (Fix-in-Cursor)?** | **Yes, with caveat** | Fix-in-Cursor **was exercised** in this benchmark and produced actionable diffs on multiple threads — the product surface works. Caveats: (1) the **free-tier quota (403) was hit after multiple iterations** in a single session, forcing a fallback; enterprise-tier rate-limit behavior is unverified. (2) Per-thread Fix-in-Cursor wall-clocks were not isolated before the quota cut off; per-PR wall-clock proxy (§8.1) lands in the adoption-killing band even with mixed Claude/Cursor assistance. |
 
 **Suggested pilot scope** (if NetApp proceeds with advisory mode):
 

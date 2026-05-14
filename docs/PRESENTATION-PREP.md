@@ -130,7 +130,7 @@ Runbook adoption bands: `<60 s` preferred, `1–3 min` tolerated, `>5 min` kills
 | Branch-protection blocking gate | **No** — no required-check / commit-status mechanism |
 | **Advisory first-pass alongside human review** | **Yes**, with 8 operational rules — see `NETAPP_RECOMMENDATION.md` §8 |
 | PR summarizer / triage tool | **No** — summary regression n=4 |
-| Fix-suggestion tool (Fix-in-Cursor product UX) | Undetermined — not measured |
+| Fix-suggestion tool (Fix-in-Cursor product UX) | **Yes, with caveat** — Fix-in-Cursor was exercised in this benchmark and works (produced actionable diffs on multiple threads). Free-tier **403 quota** hit after multiple iterations; per-thread Fix-in-Cursor wall-clock not isolated before the cut-off. Enterprise rate-limit behavior unverified. |
 
 ## 7. Anticipated Q&A — and how to answer
 
@@ -139,7 +139,7 @@ Runbook adoption bands: `<60 s` preferred, `1–3 min` tolerated, `>5 min` kills
 | "Why personal repos and not NetApp code?" | Security/egress. The methodology is repeatable on NetApp code once egress is approved. Personal repos let me run the benchmark unblocked. |
 | "Why only 4 PRs? Is the sample large enough?" | 4 PRs is small; that's why findings are **qualitative** (class-specific blind spots, summary regression mechanism, Round-2 false-positive mechanism). The cross-language D4/U4 blind spot was seen on **both** Rust and Go — that survives small sample sizes. |
 | "Could results differ on the paid tier?" | Possibly — Round 2 incremental only fired on one of three PRs (suspected free-tier quota). Documented as `NETAPP_RECOMMENDATION.md` §9 gap; worth confirming with CodeAnt support before pilot. |
-| "Did Claude really write the fixes?" | Yes — explicitly called out as methodology divergence in `fix_loop_results_go_addendum.md`. Fix-correctness still holds (12/12 toolchain-clean, `go test -race` passes). Wall-clock proxy still shows median 5 m 20 s/thread **even with LLM tailwind** — without it the number gets worse, not better. |
+| "Did Claude really write the fixes?" | **Partially.** CodeAnt's Fix-in-Cursor was used on early iterations (confirmed working, produced actionable diffs). After a free-tier **403 quota** hit mid-session, the remainder of the loop completed with a Claude assistant. Per-thread Fix-in-Cursor wall-clocks were not isolated before the cut-off. Fix-correctness still holds (12/12 toolchain-clean, `go test -race` passes). Wall-clock proxy still shows median 5m 20s/thread under this mixed-assistance setup. |
 | "What does CodeAnt say about these findings?" | Haven't asked. The recommendation is pre-vendor-engagement. If we pilot, the §8 rules become the conversation starters with the vendor. |
 | "100 % recall on the concurrency arm — why isn't that the headline?" | Round 1 = 100 %. Round 2 on the same PR posted 3 false positives. The headline is the **delta** between R1 and R2, not R1 alone. The manual-gate question is "can human skip review after CodeAnt approves" — R1 doesn't answer that; R2 does. |
 | "Does this generalize to Java?" | Zero Java tested. Documented gap. Class-based blind spots may differ for Java (Maven/Spring/annotations). Recommend a Java arm before extending beyond Go. |

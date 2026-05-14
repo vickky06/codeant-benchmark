@@ -4,7 +4,7 @@ Append into `fix_loop_results.md`.
 
 ## Methodology note (important)
 
-The runbook in `docs/Go-Fix-Loop-Runbook.md` prescribed the **UI-driven Fix-in-Cursor** workflow — click the inline-comment button, accept/edit CodeAnt's IDE diff, record per-thread wall-clock. **This was not the workflow used.** The actual fixes were drafted with a Claude assistant outside the CodeAnt product surface, then committed as one bundled commit per PR.
+The runbook in `docs/Go-Fix-Loop-Runbook.md` prescribed the **UI-driven Fix-in-Cursor** workflow — click the inline-comment button, accept/edit CodeAnt's IDE diff, record per-thread wall-clock. **The Fix-in-Cursor flow was exercised** (early iterations within the session, on multiple threads) and **confirmed to work** — it opened Cursor with the right context and produced actionable diffs. After multiple iterations a **free-tier 403 quota** kicked in and the remainder of the loop completed with a Claude assistant. Commits were bundled per-PR, not per-thread, so per-thread Fix-in-Cursor wall-clocks were not separately recorded.
 
 What this gives us:
 - **Fix-correctness data** — does each CodeAnt finding translate into an actionable, correct fix? (Yes, measured below.)
@@ -65,8 +65,8 @@ Ride-Sharing landed just below the 5-minute cutoff (4m 50s) — likely because a
 
 The wall-clock proxy is **not** a clean measurement:
 
-- **Upper-bound noise:** the interval includes context-switches, side-conversations (this benchmark was run alongside a Claude assistant), verification (`go build / vet / test / test -race`), and the push itself. Pure code-edit time is lower.
-- **Lower-bound noise:** fixes were drafted with Claude assistance, not via CodeAnt's "Fix in Cursor" button. A developer without an LLM assistant or working purely in the CodeAnt product surface would likely take longer.
+- **Upper-bound noise:** the interval includes context-switches, side-conversations, verification (`go build / vet / test / test -race`), and the push itself. Pure code-edit time is lower.
+- **Mixed-assistance noise:** fixes were drafted with a **mix** of CodeAnt's "Fix in Cursor" button (early iterations, before the 403 quota hit) and a Claude assistant (later iterations). The Fix-in-Cursor path is *not* untested in this corpus — only its per-thread wall-clock is, because we couldn't isolate it before the quota cut off.
 - **Bundled commit:** per-thread average divides total wall-clock by thread count. Some threads were trivial (RL5 one-character `<` → `<=`), others non-trivial (RL4 monitor-map + cancel-channel). Variance is not captured.
 
 Despite these caveats, the band placement is unambiguous: **median fix-loop session lands above the runbook's adoption-killing threshold.** This is the best wall-clock data this benchmark produces without the deferred UI-driven Fix-in-Cursor pass.
