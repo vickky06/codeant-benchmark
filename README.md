@@ -2,7 +2,7 @@
 
 This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai).
 
-**Canonical summary (all arms):** **`docs/BENCHMARK-SUMMARY.md`** · **Weights / JSON audit:** **`docs/CALCULATION-VERIFICATION.md`** · **Go corpus design:** **`docs/Go-Corpus-Design.md`** · **NetApp gate:** **`NETAPP_RECOMMENDATION.md`** · **Meeting walkthrough:** **`docs/PRESENTATION-PREP.md`**
+**Canonical summary (all arms):** **`docs/BENCHMARK-SUMMARY.md`** · **Weights / JSON audit:** **`docs/CALCULATION-VERIFICATION.md`** · **Go corpus design:** **`docs/Go-Corpus-Design.md`** · **NetApp gate:** **`NETAPP_RECOMMENDATION.md`** · **Meeting walkthrough:** **`docs/PRESENTATION-PREP.md`** · **vs Claude-based agents:** **`docs/CODEANT-VS-CLAUDE-AGENT.md`**
 
 - **Rust (Rexec):** PRs [#7](https://github.com/vickky06/Rexec/pull/7) / [#8](https://github.com/vickky06/Rexec/pull/8) — below.  
 - **Go:** [Uber-Eats PR #1](https://github.com/vickky06/Uber-Eats/pull/1), [Rate-Limiter PR #1](https://github.com/vickky06/Rate-Limiter/pull/1), [Ride-Sharing PR #1](https://github.com/vickky06/Ride-Sharing-Trip-Manager/pull/1) — scores `UberEats_PR_Score.md`, `RateLimiter_PR_Score.md`, `RideSharing_PR_Score.md`; artifacts under `uber-eats-pr1/`, `rate-limiter-pr1/`, `ride-sharing-pr1/` (+ `*-round2/` where applicable).

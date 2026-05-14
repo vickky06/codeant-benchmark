@@ -111,6 +111,7 @@ export GH_TOKEN='…'
 | `fix_loop_results.md`, `fix_loop_results_go_addendum.md` | Fix-me notes |
 | `docs/Go-Corpus-Design.md`, `docs/Go-Fix-Loop-Runbook.md` | Design + runbook |
 | `docs/CALCULATION-VERIFICATION.md` | Recall weights + Ride-Sharing R2 counts + merge-gating JSON note |
+| `docs/CODEANT-VS-CLAUDE-AGENT.md` | CodeAnt vs Claude-based agent (qualitative) |
 | `NETAPP_RECOMMENDATION.md` | Stakeholder recommendation |
 
 ---
@@ -120,4 +121,5 @@ export GH_TOKEN='…'
 - **`Plan.MD`** — checklist.  
 - **`README.md`** — repo entry + tables.  
 - **`docs/CALCULATION-VERIFICATION.md`** — arithmetic + merge-gating JSON audit.  
+- **`docs/CODEANT-VS-CLAUDE-AGENT.md`** — qualitative comparison vs a Claude-based agent; not a numeric head-to-head unless re-run with same rubric.  
 - **`docs/NEXT-STEPS.md`** — merge gating narrative, Bitbucket, optional vendor.
