@@ -142,13 +142,36 @@ If NetApp proceeds with an advisory-mode pilot, the following rules must be conf
 7. **Bitbucket integration confirmed.** Production target is Bitbucket, not GitHub. Confirm CodeAnt's Bitbucket integration produces equivalent inline-comment + summary behavior, ideally with a commit-status that branch protection can read (open question; pending vendor confirmation).
 8. **Baseline arm runs alongside.** Standard Go tooling (`golangci-lint`, `gosec`, `staticcheck`, `go test -race`) should run on every PR independently. CodeAnt's incremental value is the marginal recall over baseline, not absolute. Without this, no ROI claim is defensible.
 
+## 8.1 Fix-loop wall-clock (proxy measurement)
+
+Using PR commit timestamps as a proxy (R1-finish → fix-commit pushed; full per-PR fix session, not pure code-edit time):
+
+| PR | Wall-clock | Threads | Per-thread avg |
+|---|---|---|---|
+| Uber-Eats #1 | 20 m 33 s | 3 | **6 m 51 s** |
+| Rate-Limiter #1 | 26 m 40 s | 5 | **5 m 20 s** |
+| Ride-Sharing #1 | 19 m 20 s | 4 | **4 m 50 s** |
+| **Aggregate** | 66 m 33 s | 12 | **median 5 m 20 s** |
+
+**Adoption-band placement** (per `docs/Go-Fix-Loop-Runbook.md`):
+
+| Band | Threshold | This corpus |
+|---|---|---|
+| Adopted (developers prefer the workflow) | < 60 s / thread | None |
+| Tolerated (like a slow CI check) | 1–3 min / thread | None |
+| **Kills adoption** | > 5 min / thread | **2 of 3 PRs (Uber-Eats 6m 51s, Rate-Limiter 5m 20s); Ride-Sharing 4m 50s just below** |
+
+Caveats: the wall-clock proxy includes context-switches, side-conversations (Claude assistant was used), verification, and push — it is an upper bound on the developer's pure fix-edit time, *and* a lower bound on what a developer without LLM assistance would take. Despite caveats, the band placement is unambiguous: **median fix-loop session lands above the adoption-killing 5-minute threshold.** Full methodology in `fix_loop_results_go_addendum.md`.
+
+**Implication for the manual-gate recommendation:** even if the manual-gate UX problems in Section 5 were fixed, the per-thread cost of acting on a CodeAnt finding is above the adoption band that empirical product-adoption studies place as the developer-tolerance ceiling. The advisory-mode pilot in Section 10 must explicitly budget this cost, and developers should be expected to push back within one or two sprints if the rate isn't materially reduced by CodeAnt's own Fix-in-Cursor UX (which we have not yet measured).
+
 ## 9. Outstanding measurements
 
 The recommendation in this document is supported by the data gathered here, but the following measurements remain unmeasured and may shift the verdict:
 
 | Gap | Why it matters |
 |---|---|
-| **UI-driven Fix-in-Cursor wall-clock** | The runbook (`docs/Go-Fix-Loop-Runbook.md`) prescribed per-thread timing of CodeAnt's Fix-in-Cursor product UX. The actual fix loop used a Claude assistant — fix-correctness measured (8/8 addressed), developer-experience cost not. Without this, the "developers will tolerate the workflow" claim has no evidence. |
+| **UI-driven Fix-in-Cursor wall-clock (CodeAnt-product surface)** | The runbook (`docs/Go-Fix-Loop-Runbook.md`) prescribed per-thread timing via Cursor's Fix-in-Cursor button. The actual fix loop used a Claude assistant — fix-correctness measured (12/12 addressed), but the pure-CodeAnt-UX wall-clock is not. We **do** have a wall-clock proxy from PR commit timestamps (see below); CodeAnt's own product surface remains unmeasured. |
 | **Java behavior** | NetApp's web tier is Java. Zero Java tested here. CodeAnt's class-based blind spots may differ on Java (Maven / Spring / annotation-driven code). |
 | **NetApp-scale codebase behavior** | This benchmark tested 4 PRs against ~5K LOC repos. NetApp's control plane is orders of magnitude larger. CodeAnt's cross-file analysis, dependency tracking, and PR queue behavior at scale are unknown. |
 | **Historical-replay recall** | The gold-standard test — *did CodeAnt catch defects that escaped human review and required post-merge bugfixes?* — was not run. Would require a Go repo with merged PRs + post-merge bugfix commits. |

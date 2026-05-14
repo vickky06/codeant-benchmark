@@ -35,11 +35,41 @@ For each CodeAnt Round-1 finding (8 total CAUGHT across both PRs), did the fix c
 
 | Metric | Value |
 |---|---|
-| CodeAnt-flagged findings addressed by the fix commits | **8 / 8** |
-| Fix-correctness (matches CodeAnt's recommendation, compiles, tests pass) | **8 / 8** |
-| Fixes that exceed CodeAnt's suggestion with defense-in-depth | **4 / 8** (U1 fail-fast, U-BONUS map-insert ordering, RL1 empty-key guard, RL6 + NewTicker validation) |
-| Toolchain failures during the loop | **0** — both fix commits show `go build ./... && go vet ./... && go test ./...` clean |
-| Per-thread wall-clock (UI-driven) | **N/A** — Claude used instead of Fix-in-Cursor |
+| CodeAnt-flagged findings addressed by the fix commits | **8 / 8** (plus 4 on Ride-Sharing = 12 total across 3 PRs) |
+| Fix-correctness (matches CodeAnt's recommendation, compiles, tests pass) | **12 / 12** |
+| Fixes that exceed CodeAnt's suggestion with defense-in-depth | **4 / 12** (U1 fail-fast, U-BONUS map-insert ordering, RL1 empty-key guard, RL6 + NewTicker validation) |
+| Toolchain failures during the loop | **0** — all 3 fix commits show `go build / go vet / go test / go test -race` clean |
+
+## Wall-clock proxy: R1-finish → fix-commit pushed
+
+Using the **PR commit timestamp as a proxy for fix-loop duration** (Round 1 review completion timestamp → fix commit push timestamp). This measures real-world developer cost end-to-end — drafting, reading, verifying, pushing — not pure code-edit time.
+
+| PR | R1 finished | Fix commit | Wall-clock | Threads addressed | Per-thread avg |
+|---|---|---|---|---|---|
+| Uber-Eats #1 | 08:51:13Z | `658710d` 09:11:46Z | **20 m 33 s** | 3 (U1, U2, BONUS) | **6 m 51 s** |
+| Rate-Limiter #1 | 08:47:54Z | `b3c4dc0` 09:14:34Z | **26 m 40 s** | 5 (RL1, RL2, RL4, RL5, RL6) | **5 m 20 s** |
+| Ride-Sharing #1 | 09:22:19Z | `e81a2ad` 09:41:39Z | **19 m 20 s** | 4 (C1, C2, C3, C4) | **4 m 50 s** |
+| **Aggregate** | | | **66 m 33 s** | **12 threads** | **median 5 m 20 s** |
+
+### Adoption-band interpretation (per `docs/Go-Fix-Loop-Runbook.md` thresholds)
+
+| Band | Threshold | This corpus |
+|---|---|---|
+| Adopted (developers prefer the workflow) | < 60 s / thread | **No PR landed here** |
+| Tolerated (like a slow CI check) | 1–3 min / thread | **No PR landed here** |
+| **Kills adoption within one sprint** | > 5 min / thread | **2 of 3 PRs land here (Uber-Eats 6m 51s, Rate-Limiter 5m 20s)** |
+
+Ride-Sharing landed just below the 5-minute cutoff (4m 50s) — likely because all 4 findings were concurrency-class, where CodeAnt's mechanism-level reasoning ("re-entrant Lock on sync.Mutex", "concurrent map read and map write") translates more directly to a clear fix than the broader uber-eats / rate-limiter mix.
+
+### Caveats on the proxy
+
+The wall-clock proxy is **not** a clean measurement:
+
+- **Upper-bound noise:** the interval includes context-switches, side-conversations (this benchmark was run alongside a Claude assistant), verification (`go build / vet / test / test -race`), and the push itself. Pure code-edit time is lower.
+- **Lower-bound noise:** fixes were drafted with Claude assistance, not via CodeAnt's "Fix in Cursor" button. A developer without an LLM assistant or working purely in the CodeAnt product surface would likely take longer.
+- **Bundled commit:** per-thread average divides total wall-clock by thread count. Some threads were trivial (RL5 one-character `<` → `<=`), others non-trivial (RL4 monitor-map + cancel-channel). Variance is not captured.
+
+Despite these caveats, the band placement is unambiguous: **median fix-loop session lands above the runbook's adoption-killing threshold.** This is the best wall-clock data this benchmark produces without the deferred UI-driven Fix-in-Cursor pass.
 
 ## What remains un-fixed (and why)
 
