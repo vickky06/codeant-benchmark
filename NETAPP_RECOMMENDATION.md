@@ -32,7 +32,7 @@ Four PRs, each with hand-seeded defects matched to a weighted answer key.
 | Arm | Repo / PR | Surface | Defects seeded | Weighted recall |
 |---|---|---|---|---|
 | **Rexec (Rust)** | [vickky06/Rexec PR #7](https://github.com/vickky06/Rexec/pull/7) | Telemetry, audit logging, proto wire format | D1-D6 (20 pts) | **85 %** (17/20) — missed D4 silent overwrite |
-| **Uber-Eats (Go)** | [vickky06/Uber-Eats PR #1](https://github.com/vickky06/Uber-Eats/pull/1) | Domain model, state machine, money in cents | U1-U6 (20 pts) | **40 %** (8/20) — missed U3, U4, U5, U6 |
+| **Uber-Eats (Go)** | [vickky06/Uber-Eats PR #1](https://github.com/vickky06/Uber-Eats/pull/1) | Domain model, state machine, money in cents | U1-U6 (20 pts) | **40 %** weighted (8/20 pts; **2 of 6 defects** — U1, U2 caught; U3, U4, U5, U6 missed) |
 | **Rate-Limiter (Go)** | [vickky06/Rate-Limiter PR #1](https://github.com/vickky06/Rate-Limiter/pull/1) | HTTP middleware, admin endpoint, rate-limit math | RL1-RL6 (20 pts) | **75 %** (15/20) — missed RL3 wire-breaking header rename |
 | **Ride-Sharing (Go)** | [vickky06/Ride-Sharing-Trip-Manager PR #1](https://github.com/vickky06/Ride-Sharing-Trip-Manager/pull/1) | Concurrency: race, deadlock, goroutine leak, RLock-write | C1-C4 (20 pts) | **100 %** (20/20) |
 

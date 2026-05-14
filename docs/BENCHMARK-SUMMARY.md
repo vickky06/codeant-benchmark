@@ -12,7 +12,7 @@ This page is the **single entry summary** for leadership and Confluence handoff.
 ## Executive summary
 
 - **Rust (Rexec):** PR [#7](https://github.com/vickky06/Rexec/pull/7) defect-rich — **85%** weighted recall (**17 / 20**), **D4** silent-overwrite missed; PR [#8](https://github.com/vickky06/Rexec/pull/8) clean control — **0** FP, **~4 min 13 s** warm. PR #7 summary quality **1 / 5** vs strong inline (see `PR1_CodeAnt_Score.md`).
-- **Go — Uber-Eats PR #1:** **40%** recall (**8 / 20**); **U4** silent-overwrite missed (**same class as Rexec D4**). **0** inline FP (round 1). Summary quality **1 / 5**. Cold **~6 min**. Source: `UberEats_PR_Score.md`, `uber-eats-pr1/`.
+- **Go — Uber-Eats PR #1:** **40%** weighted recall (**8 / 20** weighted; **2 of 6 defects** caught — U1 secret + U2 PII log); **U3, U4, U5, U6 missed** (U4 silent overwrite = **same class as Rexec D4**). **0** inline FP (round 1). Summary quality **1 / 5**. Cold **~6 min**. Source: `UberEats_PR_Score.md`, `uber-eats-pr1/`.
 - **Go — Rate-Limiter PR #1:** **75%** recall (**15 / 20**); **RL3** wire-breaking rename missed. **0** inline FP. Summary **1 / 5**. Warm **~4 min 35 s**. Source: `RateLimiter_PR_Score.md`, `rate-limiter-pr1/`.
 - **Go — Ride-Sharing PR #1:** **100%** recall (**20 / 20**) on four seeded concurrency defects; **0** FP round 1; summary **1 / 5** (✅ vs Critical inline — systematic). Cold **~4 min 17 s**. **Round 2:** incremental **~5 min 37 s**; **3 false positives** on post-fix `GetAllStates` (see `RideSharing_PR_Score.md` § Round 2). Artifacts: `ride-sharing-pr1/`, `ride-sharing-pr1-round2/`.
 - **Cross-language:** Concurrency class **strong** on Ride-Sharing + RL4; **silent overwrite blind spot** reproduced (**D4 + U4**). Wire/API renames weak (**D3 pattern vs RL3**). See class table in `RideSharing_PR_Score.md` § “Cross-language updated picture”.
@@ -24,13 +24,15 @@ This page is the **single entry summary** for leadership and Confluence handoff.
 
 ## Results table (headline)
 
-| Track | PR | Language | Weighted recall | FP (inline R1) | Summary 1–5 | Latency (typical) |
-|-------|-----|----------|-------------------|----------------|-------------|-------------------|
-| Rexec PR #7 | [link](https://github.com/vickky06/Rexec/pull/7) | Rust | **85%** (17/20) | 0 | 1 | ~9.2 min cold |
-| Rexec PR #8 | [link](https://github.com/vickky06/Rexec/pull/8) | Rust | N/A (clean) | 0 | 4 | ~4.2 min warm |
-| Uber-Eats PR #1 | [link](https://github.com/vickky06/Uber-Eats/pull/1) | Go | **40%** (8/20) | 0 | 1 | ~6 min cold |
-| Rate-Limiter PR #1 | [link](https://github.com/vickky06/Rate-Limiter/pull/1) | Go | **75%** (15/20) | 0 | 1 | ~4.6 min warm |
-| Ride-Sharing PR #1 | [link](https://github.com/vickky06/Ride-Sharing-Trip-Manager/pull/1) | Go | **100%** (20/20) | 0 R1; **3 FP R2** on fix head | 1 | ~4.3 min cold; ~5.6 min incremental |
+> **Reading convention:** `X / 20` is **weighted points** (not defect count). Each defect-rich PR seeds 4–6 defects whose severity weights sum to 20. The `caught / total` column below resolves any ambiguity.
+
+| Track | PR | Language | Defects caught / total | Weighted recall | FP (inline R1) | Summary 1–5 | Latency (typical) |
+|-------|-----|----------|-------------------------|-------------------|----------------|-------------|-------------------|
+| Rexec PR #7 | [link](https://github.com/vickky06/Rexec/pull/7) | Rust | **5 / 6** (missed D4) | **85%** (17/20) | 0 | 1 | ~9.2 min cold |
+| Rexec PR #8 | [link](https://github.com/vickky06/Rexec/pull/8) | Rust | clean control | N/A (clean) | 0 | 4 | ~4.2 min warm |
+| Uber-Eats PR #1 | [link](https://github.com/vickky06/Uber-Eats/pull/1) | Go | **2 / 6** (missed U3, U4, U5, U6) | **40%** (8/20) | 0 | 1 | ~6 min cold |
+| Rate-Limiter PR #1 | [link](https://github.com/vickky06/Rate-Limiter/pull/1) | Go | **5 / 6** (missed RL3) | **75%** (15/20) | 0 | 1 | ~4.6 min warm |
+| Ride-Sharing PR #1 | [link](https://github.com/vickky06/Ride-Sharing-Trip-Manager/pull/1) | Go | **4 / 4** | **100%** (20/20) | 0 R1; **3 FP R2** on fix head | 1 | ~4.3 min cold; ~5.6 min incremental |
 
 ---
 

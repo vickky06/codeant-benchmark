@@ -16,7 +16,8 @@
 | U5 | Correctness | 2 | **MISSED** | 0 | No comment on `internals/stateMachine/stateMachine.go`. Action-error swallow with `return nil` after rollback un-flagged. |
 | U6 | Failure-handling | 2 | **MISSED** | 0 | No comment on the pre-existing `Preparing → Cancelled` no-Guard transition. Expected — file was unmodified at that line; CodeAnt is hunk-focused. |
 
-**Total caught: 8 / 20 ⇒ Recall: 40 %**
+**Total caught: 8 / 20 weighted points ⇒ Recall: 40 %**
+**By defect count: 2 of 6 seeded defects caught** (U1, U2). Missed: U3, U4, U5, U6.
 
 ## Other metrics
 
