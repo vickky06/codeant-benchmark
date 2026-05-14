@@ -1,10 +1,20 @@
-# Benchmark plan — CodeAnt on Rexec
+# Benchmark plan — CodeAnt (Rexec + extensions)
 
-Living checklist for the **vickky06/Rexec** PR benchmark and **codeant-benchmark** artifacts. Update this file as steps finish.
+Living checklist for **vickky06/Rexec** (Rust) and **additional assessments** in this repo. Update as steps finish.
 
 ---
 
-## Completed
+## Go assessments (add your two projects)
+
+**Convention:** one folder per project under **`assessments/go/<slug>/`** — see **`assessments/go/README.md`**.
+
+- [ ] **Go assessment 1** — `assessments/go/<slug>/` with `README.md`, `SCORE.md`, `artifacts/*.json` (and `ANSWER_KEY.md` if defect-seeded).
+- [ ] **Go assessment 2** — same layout for second repo/PR set.
+- [ ] **Summary** — extend **`docs/BENCHMARK-SUMMARY.md`** with a short “Go” subsection (links + headline metrics) once scores exist.
+
+---
+
+## Completed (Rexec / Rust)
 
 - [x] **PR 1 (defect-rich)** — [Rexec PR #7](https://github.com/vickky06/Rexec/pull/7): six seeded defects, answer key (`Rexec_PR1_AnswerKey.md`), weighted scoring.
 - [x] **PR 1 scoring doc** — `PR1_CodeAnt_Score.md` (recall, FPs, coverage, cold latency ~9 min, D4 miss noted).
@@ -67,8 +77,9 @@ Living checklist for the **vickky06/Rexec** PR benchmark and **codeant-benchmark
 
 | Doc | Purpose |
 |-----|---------|
-| **`docs/BENCHMARK-SUMMARY.md`** | **Canonical one-page summary** (exec bullets, tables, validity, reproduce). |
+| **`docs/BENCHMARK-SUMMARY.md`** | **Canonical one-page summary** (Rexec; extend for Go when ready). |
+| **`assessments/go/README.md`** | **Go** assessment layout and slots. |
 | `docs/NEXT-STEPS.md` | Short operational next steps (merge gating, Bitbucket). |
 | `fix_loop_results.md` | Fix-me outcomes (append UI-driven run when complete). |
-| `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Scored results. |
+| `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Rexec scored results. |
 | `README.md` | Entry point and tables. |

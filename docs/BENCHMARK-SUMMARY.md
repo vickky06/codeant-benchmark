@@ -1,11 +1,12 @@
-# CodeAnt on Rexec — benchmark summary
+# CodeAnt benchmarks — summary (Rexec + extensions)
 
 **Repository:** [vickky06/codeant-benchmark](https://github.com/vickky06/codeant-benchmark)  
-**Application:** [vickky06/Rexec](https://github.com/vickky06/Rexec)  
+**Primary application (Rust):** [vickky06/Rexec](https://github.com/vickky06/Rexec)  
+**Go assessments:** add under **`assessments/go/<slug>/`** — layout **`assessments/go/README.md`** (two projects in flight).  
 **Status:** Draft / living (merge findings branch to `main` when ready)  
-**Last aligned to docs:** `PR1_CodeAnt_Score.md`, `PR2_CodeAnt_Score.md`, `fix_loop_results.md`, `pr7-round2/`, `pr8/`, `Plan.MD` (2026-05-13 benchmark run)
+**Last aligned to docs:** `PR1_CodeAnt_Score.md`, `PR2_CodeAnt_Score.md`, `fix_loop_results.md`, `pr7-round2/`, `pr8/`, `Plan.MD` (2026-05-13 Rexec benchmark run)
 
-This page is the **single entry summary**. Every quantitative claim below is backed by the linked files.
+This page is the **single entry summary** for **Rexec**. When Go `SCORE.md` files exist, add a short **Go** subsection here (or link to each `assessments/go/<slug>/README.md`).
 
 ---
 
@@ -18,7 +19,20 @@ This page is the **single entry summary**. Every quantitative claim below is bac
 - **Extra signal:** CodeAnt flagged blocking `curl` in async `cleanup_ports` beyond the six-defect answer key (credit in `PR1_CodeAnt_Score.md`).
 - **Merge gating:** Reviews remain **`COMMENTED`** with empty body in exports — **branch-protection “required review”** equivalence **not verified** here; confirm **Checks** on each PR.
 - **Validity (one line):** Strong **controlled feasibility** signal for one vendor + one codebase; **not** a statistical proof of correctness across all repos or agents.
-- **Open housekeeping:** Merge findings branch to `main`; rotate benchmark PAT when done; optional **UI-per-thread “Fix in Cursor”** timing if you want that dimension measured explicitly (`Plan.MD`).
+- **Open housekeeping:** Merge findings branch to `main`; rotate benchmark PAT when done; optional **UI-per-thread “Fix in Cursor”** timing (`Plan.MD`). **Go:** add two tracks under `assessments/go/<slug>/` and extend this doc once each has `SCORE.md`.
+
+---
+
+## Go assessments (in progress)
+
+**Layout:** `assessments/go/README.md` · **Checklist:** `Plan.MD` (Go assessment 1 / 2).
+
+| Project | Path | When done |
+|---------|------|-----------|
+| *TBD* | `assessments/go/<slug>/` | `README.md`, `SCORE.md`, `artifacts/*.json` (+ `ANSWER_KEY.md` if seeded) |
+| *TBD* | `assessments/go/<slug>/` | Same |
+
+Use the **same metric classes** as Rexec (recall vs key, FP, noise, coverage, latency, summary vs inline) so Rust vs Go comparisons stay fair.
 
 ---
 
@@ -192,7 +206,8 @@ Full checklist: `docs/PR7-ROUND2-EXECUTION-LOG.md` · Overall plan: `Plan.MD` ·
 | `Plan.MD` | Completed vs remaining |
 | `docs/PR8-comments-inventory.md` | PR #8 threads |
 | `docs/PR7-ROUND2-EXECUTION-LOG.md` | Round 2 runbook |
-| `fetch_rexec_pr.sh` | Fetch helper |
+| `assessments/go/README.md` | **Go** — where to add two project folders + conventions |
+| `fetch_rexec_pr.sh` | Fetch helper (Rexec); copy/adapt `REPO` + `OUT` for Go PRs |
 
 ---
 

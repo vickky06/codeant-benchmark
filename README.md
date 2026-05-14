@@ -1,8 +1,11 @@
-# CodeAnt benchmark — Rexec (Rust)
+# CodeAnt benchmarks — Rexec (Rust) + Go
 
-This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai) on a controlled pull request.
+This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai).
 
-**One-page summary (exec + methodology + links):** **`docs/BENCHMARK-SUMMARY.md`**
+- **Rust (Rexec):** controlled PRs [#7](https://github.com/vickky06/Rexec/pull/7) / [#8](https://github.com/vickky06/Rexec/pull/8) — see below.  
+- **Go:** add assessments under **`assessments/go/<project-slug>/`** — see **`assessments/go/README.md`**.
+
+**One-page summary (Rexec):** **`docs/BENCHMARK-SUMMARY.md`** · **Multi-language index:** **`assessments/go/README.md`**
 
 ## Benchmark PR (defect-rich)
 
@@ -54,7 +57,7 @@ Full analysis: **`PR2_CodeAnt_Score.md`** · Artifacts: **`pr8/*.json`**
 
 ## What to do next
 
-**`Plan.MD`** (checklist) · **`docs/NEXT-STEPS.md`** (merge gating, Bitbucket pilot) · PR #8 threads: **`docs/PR8-comments-inventory.md`**.
+**`Plan.MD`** (checklist) · **`docs/NEXT-STEPS.md`** (merge gating, Bitbucket pilot) · PR #8 threads: **`docs/PR8-comments-inventory.md`** · **Go assessments:** **`assessments/go/README.md`**
 
 ## License / data
 
