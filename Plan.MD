@@ -30,6 +30,27 @@ Living checklist for the **vickky06/Rexec** PR benchmark and **codeant-benchmark
 
 ---
 
+## Go corpus arm (2026-05-14, branch `docs/go-corpus-2026-05-14`)
+
+### Completed
+
+- [x] **Go corpus design** — `docs/Go-Corpus-Design.md`: rationale for three Go arms covering different defect surfaces (HTTP/auth, domain logic, concurrency).
+- [x] **Uber-Eats arm** — `vickky06/Uber-Eats` PR #1 (`feat/payments-and-restaurant-registry`): six seeded defects (U1 hardcoded Stripe key, U2 PII log, U3 Quantity narrow, U4 silent overwrite, U5 action error swallow, U6 authz gap). Answer key, Round 1 score (40 % recall, 0 FP), snapshots in `uber-eats-pr1/` and `uber-eats-pr1-round2/` (R2 did not fire — suspected 403).
+- [x] **Rate-Limiter arm** — `vickky06/Rate-Limiter` PR #1 (`feat/observability-and-policy-rotation`): six seeded defects (RL1 admin key, RL2 header leak, RL3 wire-break, RL4 goroutine leak, RL5 off-by-one, RL6 error swallow). Answer key, Round 1 score (75 % recall, 0 FP, 1 unseeded `NewTicker` panic catch), snapshot in `rate-limiter-pr1/` (R2 did not fire — suspected 403).
+- [x] **Ride-Sharing arm** — `vickky06/Ride-Sharing-Trip-Manager` PR #1 (`feat/dispatch-dashboard-and-autopilot`): four seeded concurrency defects (C1 race, C2 leak, C3 deadlock, C4 RLock-write). Answer key, Round 1 score (100 % recall, 0 FP), snapshots in `ride-sharing-pr1/` and `ride-sharing-pr1-round2/`.
+- [x] **Generalized fetch script** — `fetch_pr.sh <owner/repo> <pr#> [outdir]`. Uses `gh` CLI auth; no `GH_TOKEN` env required.
+- [x] **Go fix loop** — Fixes applied to all three PRs (commits `658710d`, `b3c4dc0`, `e81a2ad`). All 8 CodeAnt-flagged findings addressed; `go build / vet / test / test -race` clean. Methodology: Claude assistant, not Fix-in-Cursor. See `fix_loop_results_go_addendum.md`.
+- [x] **Round 2 measurement (Ride-Sharing only)** — 5 min 37 s incremental. **3 of 3 new comments on the post-fix commit are false positives** re-flagging the fixed `GetAllStates`. `go test -race` confirms code is correct. New Sequence Diagram feature observed. Documented in `RideSharing_PR_Score.md` Round 2 section.
+
+### Remaining (Go arm)
+
+- [ ] **Open codeant-benchmark PR** for `docs/go-corpus-2026-05-14` — mirrors the 2026-05-13 branch pattern.
+- [ ] **Round 2 for Uber-Eats / Rate-Limiter** — re-trigger via `@codeant-ai: review` once quota resets, or document permanent quota-failure if it doesn't fire on push.
+- [ ] **UI-driven Fix-in-Cursor pass on one Go PR** — Rate-Limiter recommended (3 threads: RL5 easy, RL2 medium, RL4 hard). Records per-thread wall-clock + accept-as-is fraction to fill the developer-experience gap in `fix_loop_results_go_addendum.md`.
+- [ ] **NetApp recommendation writeup** — sufficient body of evidence now exists. Headline: Round 1 recall is class-dependent (strong on concurrency / secrets, weak on silent-overwrite / contract narrowing / wire-breaks). **Manual-gate model fails on the post-fix Round 2 UX** — no auto-resolve, count grows on fix, R2 can re-flag fixed code as false positive.
+
+---
+
 ## Fix-me loop — use the PR web UI (required)
 
 **Goal:** Measure the product path where review comments drive fixes, not only hand-edited diffs.
