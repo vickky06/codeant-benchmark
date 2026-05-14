@@ -1,6 +1,8 @@
-# CodeAnt benchmark — Rexec (Rust)
+# CodeAnt benchmark
 
-This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai) on a controlled pull request.
+This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai) across four PRs spanning Rust (Rexec) and Go (Uber-Eats, Rate-Limiter, Ride-Sharing).
+
+> **NetApp pilot recommendation: [`NETAPP_RECOMMENDATION.md`](NETAPP_RECOMMENDATION.md)** — decision-grade synthesis. TL;DR: do not adopt as a manual gate; adopt in advisory mode with 8 operational rules.
 
 ## Benchmark PR (defect-rich)
 
