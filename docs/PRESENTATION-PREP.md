@@ -36,12 +36,67 @@ Both turned out to be wrong in instructive ways — covered in §5 below.
 | **Round 1 + Fix Loop + Round 2** | Round 1 measures recall. Fix loop tests whether findings are actionable. Round 2 tests whether the bot recognizes fixes — which is the load-bearing question for "human reviews only after approval." |
 | **Independent answer keys, scored against** | Each PR has a pre-written `*_AnswerKey.md` listing expected catches with required keywords. Scoring is "did the inline comment match those keywords." Reduces bias. |
 
-## 3. The four arms in one paragraph each
+## 3. The four repos — why each was the best available, what each uniquely tests
 
-- **Rexec (Rust)** — pre-existing arm. Six seeded defects across telemetry, audit logging, proto wire format. Round 1 caught 5/6 (the missed one was D4 silent overwrite). Baseline cross-language reference.
-- **Uber-Eats (Go)** — domain model, state machine, money in cents. Seeded U1–U6. Round 1 caught only U1 and U2 (40 %). Misses included U4 silent overwrite (same class as Rust D4) and U3 integer narrowing.
-- **Rate-Limiter (Go)** — HTTP middleware, admin endpoint, rate-limit math. Seeded RL1–RL6. Round 1 caught 5/6 (75 %). Miss was RL3, a wire-breaking header rename. One bonus catch (NewTicker panic on non-positive duration).
-- **Ride-Sharing (Go)** — concurrency surface. Seeded C1–C4. Round 1 caught **all 4** (100 %) with mechanism-level reasoning. Round 2 then posted **3 false positives** on the fixed code — the single most important finding.
+**Selection principle**, applied uniformly:
+
+1. **Realistic shape** — must look like real service code, not a toy
+2. **Defect-surface variety** — must support 4–6 distinct seeded defect classes
+3. **Small enough to fully review** — < 600 LOC each, so we can expect file-level CodeAnt coverage
+4. **Personal ownership** — seeding fake credentials in NetApp code is a non-starter
+5. **Together covering the Go control-plane surface** — domain logic + HTTP middleware + concurrency, no major class left blank
+
+The four repos were chosen because *together* they cover the defect surface NetApp actually cares about. Individually each is narrow; collectively they triangulate.
+
+### 3.1 Rexec (Rust) — the cross-language baseline
+
+| | |
+|---|---|
+| **Surface** | CLI / service with telemetry, audit logging, proto APIs, Tokio async |
+| **Why this one** | Pre-existing benchmark target from the prior round; established the D1–D6 taxonomy reused on every Go arm |
+| **Uniquely tests** | Cross-language comparability; Rust `Result` idioms; proto wire-format defects (D3) |
+| **Doesn't cover** | Anything Go-specific (this is why we needed Go arms at all) |
+| **Recall** | 85 % (5/6 defects) — missed D4 silent overwrite |
+
+### 3.2 Uber-Eats (Go) — the domain-logic arm
+
+| | |
+|---|---|
+| **Surface** | Order service, actor-aware state machine, money in cents (`int64`), Customer / Restaurant / Order entities |
+| **Why this one (best available)** | **Best domain model among personal Go repos.** Only one with actor-based authorization, money handling, and an unmodified pre-existing authz gap (`Preparing → Cancelled` has no Guard) usable as an unseeded-recall bonus. |
+| **Uniquely tests** | Business-logic defects — integer narrowing (U3), silent map overwrite (U4 — the D4 mirror), action error swallow (U5), authz gaps in unchanged hunks (U6) |
+| **Doesn't cover** | HTTP layer, heavy concurrency |
+| **Recall** | 40 % (2/6 defects) — missed U3, U4, U5, U6 |
+
+### 3.3 Rate-Limiter (Go) — the HTTP / middleware arm
+
+| | |
+|---|---|
+| **Surface** | HTTP middleware + admin endpoint + three pluggable strategies (TokenBucket / FixedWindow / SlidingWindow) + ClientStore |
+| **Why this one (best available)** | **Only personal Go repo with a real HTTP attack surface.** The admin endpoint with zero authentication was a pre-existing real defect — perfect adversarial fixture. The three rate-limit strategies give pluggable-interface complexity that mirrors NetApp's control-plane shape. |
+| **Uniquely tests** | HTTP/middleware-layer defects most relevant to NetApp — header logging leak (RL2), wire-breaking header rename (RL3), admin-auth secret handling (RL1), rate-limit math off-by-one (RL5) |
+| **Doesn't cover** | State machine, domain model with money, concurrency primitives beyond mutex |
+| **Recall** | 75 % (5/6 defects) — missed RL3 (wire-breaking rename); 1 unseeded bonus catch |
+
+### 3.4 Ride-Sharing (Go) — the concurrency arm
+
+| | |
+|---|---|
+| **Surface** | Trip state machine + event bus with observer pattern + atomic counter + pricing strategy + per-trip mutex |
+| **Why this one (best available)** | **Only personal Go repo with a concurrency surface rich enough to seed race / deadlock / goroutine-leak defects naturally.** Has unbounded goroutine fan-out in `eventbus.Publish` (existing unseeded defect) and per-trip locking that supports reentrant-Lock seeding. |
+| **Uniquely tests** | Concurrency defect classes Go control-plane code actually has — data race (C1), goroutine leak (C2), reentrant-Lock deadlock (C3), write-under-RLock (C4) |
+| **Doesn't cover** | HTTP layer, money handling, domain-model breadth |
+| **Recall** | 100 % (4/4 defects) on Round 1. **Round 2: 3 false positives** on already-fixed code — the most important finding of the benchmark. |
+
+### 3.5 What we deliberately did not use, and why
+
+| Repo / corpus | Why excluded |
+|---|---|
+| **Lru-Cache** (personal Go) | Too small (324 LOC), no HTTP / state-machine surface. Used as **unseeded-recall baseline only** — not as a seeded benchmark arm. |
+| **Java / Spring repo** | NetApp web tier is Java; no clean personal Java repo with comparable structured surface was available at the time. **Documented as a gap** in `NETAPP_RECOMMENDATION.md` §9. |
+| **NetApp production code** | Security / egress — couldn't send to external SaaS without sign-off; seeding fake credentials in production-shaped code is operationally a non-starter. |
+
+**Honest framing for the meeting:** "These four repos are not a random sample — they were curated to cover the defect surfaces NetApp's Go control plane actually has, while staying within what could be benchmarked without security clearance. The **class-based findings** (concurrency strong, silent-overwrite blind, summary regression, Round-2 false-positive mechanism) are what generalizes; the **absolute recall percentages** are conditioned on this specific corpus."
 
 ## 4. Methodology in 5 steps
 
