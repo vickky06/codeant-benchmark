@@ -1,55 +1,79 @@
 # Go fix-me loop — results (2026-05-14)
 
-Append the table below into `fix_loop_results.md` once timings are confirmed.
+Append into `fix_loop_results.md`.
 
-## Approach
+## Methodology note (important)
 
-All thread fixes were applied via the **Fix in Cursor** UI flow on the PR inline comments, then bundled into one fix commit per PR rather than per-thread commits. This is a methodology deviation from the Rexec runbook in `Plan.MD:33-62` — granularity of per-thread reconstruction is lost, but per-thread timing was tracked separately during the loop.
+The runbook in `docs/Go-Fix-Loop-Runbook.md` prescribed the **UI-driven Fix-in-Cursor** workflow — click the inline-comment button, accept/edit CodeAnt's IDE diff, record per-thread wall-clock. **This was not the workflow used.** The actual fixes were drafted with a Claude assistant outside the CodeAnt product surface, then committed as one bundled commit per PR.
 
-- Uber-Eats fix commit: `658710d` — "fix: address PR review — drop hardcoded Stripe key, fail orders on pre-auth error, redact PII from audit logs"
-- Rate-Limiter fix commit: `b3c4dc0` — "fix: address PR review findings on admin auth, policy lifecycle, and limiter math"
+What this gives us:
+- **Fix-correctness data** — does each CodeAnt finding translate into an actionable, correct fix? (Yes, measured below.)
 
-## Per-thread timings
+What this does **not** give us:
+- **CodeAnt's "Fix in Cursor" suggestion quality** — never exercised.
+- **Per-thread UI-driven wall-clock** — no apples-to-apples comparison against the adoption-band thresholds (<60 s preferred, >5 min kills) in the runbook.
+- **The "accepted CodeAnt fix as-is vs edited" fraction** — not applicable when Claude generated the diffs.
 
-> Fill the three numeric columns from your notes. Leave `?` for any you didn't capture.
+A separate pass using Cursor's "Fix in Cursor" button on the seeded PRs is still required before the NetApp writeup can make any claim about developer-experience cost.
 
-| # | Repo | Defect ID | Inline thread URL | UI click → toolchain clean | Accepted CodeAnt fix as-is? | Notes |
-|---|------|-----------|-------------------|----------------------------|----------------------------|-------|
-| 1 | Uber-Eats | U1 (Stripe key) | https://github.com/vickky06/Uber-Eats/pull/1#discussion_r3240199930 | _Nm Ns_ | Y/N | |
-| 2 | Uber-Eats | U2 (PII log) | https://github.com/vickky06/Uber-Eats/pull/1#discussion_r3240201966 | _Nm Ns_ | Y/N | |
-| 3 | Uber-Eats | BONUS (chargeOrder error) | https://github.com/vickky06/Uber-Eats/pull/1#discussion_r3240201973 | _Nm Ns_ | Y/N | |
-| 4 | Rate-Limiter | RL1 (Admin key) | https://github.com/vickky06/Rate-Limiter/pull/1#discussion_r3240185284 | _Nm Ns_ | Y/N | |
-| 5 | Rate-Limiter | RL2 (header leak) | https://github.com/vickky06/Rate-Limiter/pull/1#discussion_r3240185985 | _Nm Ns_ | Y/N | |
-| 6 | Rate-Limiter | RL4 (goroutine leak) | https://github.com/vickky06/Rate-Limiter/pull/1#discussion_r3240184533 | _Nm Ns_ | Y/N | |
-| 7 | Rate-Limiter | RL5 (off-by-one) | https://github.com/vickky06/Rate-Limiter/pull/1#discussion_r3232323200 (approx) | _Nm Ns_ | Y/N | |
-| 8 | Rate-Limiter | RL6 (factory error swallow) | (boot path + update path threads) | _Nm Ns_ | Y/N | |
+## Fix coverage table
 
-## Verification on each fix commit
+For each CodeAnt Round-1 finding (8 total CAUGHT across both PRs), did the fix commit actually address it, and is the fix correct?
 
-Both fix commits verified clean before push:
+| # | Repo | Defect | CodeAnt's suggestion (paraphrased) | Fix in commit | Verdict |
+|---|------|--------|------------------------------------|---------------|---------|
+| 1 | Uber-Eats | U1 — hardcoded `StripeLiveKey` | Load from runtime secret manager/env | Removed const; `os.Getenv("STRIPE_SECRET_KEY")` + fail-fast on empty | **Addressed (+ defense-in-depth: fail-fast)** |
+| 2 | Uber-Eats | U2 — PII in `[ORDER_AUDIT]` log | Log minimal non-sensitive identifiers | Format string changed from `%+v` (full structs) to `%s` for `order.Id`, `customer.Id`, `restaurant.Id` only | **Addressed (clean minimal)** |
+| 3 | Uber-Eats | BONUS — `chargeOrder` error swallowed | Propagate / fail order on pre-auth failure | Moved `chargeOrder` **before** map insert; returns `fmt.Errorf("payment pre-authorization failed: %w", err)` on failure | **Addressed (+ improvement: prevents orphan map entry)** |
+| 4 | Rate-Limiter | RL1 — hardcoded `AdminAPIKey` const | Load from secure runtime config | `const` → `var AdminAPIKey = os.Getenv("ADMIN_API_KEY")`. Plus `AdminAPIKey == ""` guard in `UpdateStrategy` | **Addressed (+ defense-in-depth: empty-key rejection)** |
+| 5 | Rate-Limiter | RL2 — full request headers logged | Redact sensitive headers or allowlist | Added `sensitiveHeaders` set + `redactHeaders()` helper; logs go through `redactHeaders(r.Header)` | **Addressed (clean denylist with `[REDACTED]` token)** |
+| 6 | Rate-Limiter | RL4 — UpdateLimiter ticker goroutine leak | Track per-client monitor; cancel previous on update | Added `monitors map[string]chan struct{}` field. Closes previous monitor before installing new one. Goroutine `select`s on done channel | **Addressed (mirrors CodeAnt's suggestion almost line-for-line)** |
+| 7 | Rate-Limiter | RL5 — `<=` flipped to `<` (off-by-one) | Restore `<=` so limit is inclusive | Boundary check reverted to `int64(weight)+1 <= sw.maxRequests`. Test also reverted (3-of-3 expectation restored) | **Addressed** |
+| 8 | Rate-Limiter | RL6 — factory errors swallowed in both `NewClientStore` and `UpdateLimiter` | Return the validation error; surface bad config to operator | Both paths now return `fmt.Errorf(...)`. Plus `WindowSize <= 0` validation added (addresses the unseeded `NewTicker`-panic bonus catch) | **Addressed (+ both seeded paths + the bonus)** |
 
-```text
-uber-eats:    go build ./... PASS, go vet ./... PASS, go test ./... PASS
-rate-limiter: go build ./... PASS, go vet ./... PASS, go test ./... PASS
-```
-
-## Aggregates (fill from the table above)
+## Aggregates
 
 | Metric | Value |
 |---|---|
-| Threads addressed | 8 |
-| Median wall-clock per thread | _Nm Ns_ |
-| Threads accepted as-is (no manual edit) | _N/8_ |
-| Threads requiring manual rewrite of CodeAnt suggestion | _N/8_ |
-| Toolchain failures during the loop | _N_ |
-| Adoption-band per [Go-Fix-Loop-Runbook.md] (<60s preferred, 1–3m tolerable, >5m kills adoption) | _band_ |
+| CodeAnt-flagged findings addressed by the fix commits | **8 / 8** |
+| Fix-correctness (matches CodeAnt's recommendation, compiles, tests pass) | **8 / 8** |
+| Fixes that exceed CodeAnt's suggestion with defense-in-depth | **4 / 8** (U1 fail-fast, U-BONUS map-insert ordering, RL1 empty-key guard, RL6 + NewTicker validation) |
+| Toolchain failures during the loop | **0** — both fix commits show `go build ./... && go vet ./... && go test ./...` clean |
+| Per-thread wall-clock (UI-driven) | **N/A** — Claude used instead of Fix-in-Cursor |
 
-## Notable observations during the loop
+## What remains un-fixed (and why)
 
-- _e.g. CodeAnt's RL4 suggested fix included the per-client monitor map AND the stop-channel cleanup correctly — accepted as-is_
-- _e.g. U1's "Fix in Cursor" template suggested env-var fallback, didn't include fail-fast; manually added the empty-string guard_
-- _e.g. RL5 fix landed in two files (SlidingWindow.go + strategies_test.go); CodeAnt's prompt covered the impl but not the test reversion_
+Five seeded defects + 1 wire-break still live in code:
 
-## What this measurement gives the NetApp writeup
+| ID | Repo | Why unfixed |
+|----|------|-------------|
+| U3 | Uber-Eats | `Quantity int → uint8` narrowing — CodeAnt did not flag it in Round 1 |
+| U4 | Uber-Eats | `AddRestaurant` silent overwrite — CodeAnt did not flag (the cross-language D4 blind spot) |
+| U5 | Uber-Eats | `stateMachine.Apply` action error swallow — CodeAnt did not flag |
+| U6 | Uber-Eats | `Preparing → Cancelled` actor-guard gap — file was modified for U5 area but this hunk was unmodified; CodeAnt did not flag |
+| RL3 | Rate-Limiter | `ClientIDHeader` X-API-Key → X-Client-ID rename — CodeAnt did not flag (the wire-break miss) |
 
-Once filled, this table answers: **"How much developer time does each CodeAnt finding cost to act on, and at what fraction of CodeAnt suggestions does the developer accept verbatim?"** Both are gating considerations for adoption that pure recall/precision numbers don't surface.
+This is the intended fix-loop behavior: only address what CodeAnt finds. The 5 unfixed defects **are** the proof points for the "human must independently check these classes" rule in the manual-gate writeup.
+
+## What this measurement tells us — and what it doesn't
+
+**Tells us:**
+- **Every Critical/High CodeAnt finding in this benchmark was actionable.** No false positives, no findings too vague to fix, no findings requiring more context than the inline comment provided.
+- **CodeAnt's textual suggestions are sufficient input for a correct fix** — at least when a strong assistant or experienced developer drafts the patch.
+- **Defense-in-depth often comes naturally** — 4/8 fixes went beyond the minimal patch CodeAnt suggested.
+
+**Does NOT tell us:**
+- Whether Cursor's "Fix in Cursor" button generates equivalent diffs to what Claude produced.
+- Per-thread time-to-fix in the actual CodeAnt product workflow.
+- Whether developers without an LLM assistant or strong concurrency intuition would produce equivalent fixes.
+
+## Recommended follow-up for the NetApp writeup
+
+To produce decision-grade developer-experience data, **one more pass** on either Uber-Eats PR #1 or Rate-Limiter PR #1 using Cursor's "Fix in Cursor" button is needed. Suggested approach if quota is a constraint:
+
+1. Pick **one PR** (Rate-Limiter is the better target — more findings, broader variety: secret, leak, off-by-one, error path).
+2. Pick **3 threads** spanning easy/medium/hard fix complexity (e.g., RL5 easy off-by-one, RL2 medium denylist, RL4 hard goroutine lifecycle).
+3. Run the UI workflow exactly per `docs/Go-Fix-Loop-Runbook.md`, recording wall-clock and accept-as-is Y/N.
+4. Compare the Cursor-generated diff against the Claude-generated diff already in `b3c4dc0` — does CodeAnt's tooling produce a comparable fix without LLM assistance?
+
+That single follow-up pass is the gap between "we have recall data" and "we have manual-gate adoption data."
