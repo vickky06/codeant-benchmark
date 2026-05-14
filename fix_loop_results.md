@@ -49,3 +49,18 @@ Never paste GitHub PATs into chat or commit them. Use `export GH_TOKEN=...` only
 **Artifacts:** `pr7-round2/*.json` · Runbook / checklist: `docs/PR7-ROUND2-EXECUTION-LOG.md`.
 
 Fixes on the branch aligned with the earlier local rehearsal (proto, executor error path, audit log shape, telemetry env gating, `force: true`); **D4** still a known CodeAnt blind spot from round 1.
+
+---
+
+## Go corpus fix loop (2026-05-14)
+
+The three-arm Go benchmark (uber-eats, rate-limiter, ride-sharing) ran its own fix loop. Methodology differs from the Rexec UI-driven plan in `Plan.MD:33-62`:
+
+- **Tool used:** Claude assistant, **not CodeAnt's "Fix in Cursor"** button (403 quota blocked the latter on rideSharingApp; Uber-Eats / Rate-Limiter were done with Claude for consistency).
+- **Commit style:** one bundled commit per PR, not per-thread commits.
+- **What is measured:** fix-correctness (8/8 CodeAnt-flagged findings addressed, all `go build / vet / test / test -race` clean).
+- **What is not measured:** CodeAnt's own Fix-in-Cursor suggestion quality, per-thread UI-driven wall-clock vs adoption-band thresholds.
+
+Full per-defect coverage table + post-fix Round 2 findings: **`fix_loop_results_go_addendum.md`** and the Round 2 sections of **`UberEats_PR_Score.md`** / **`RateLimiter_PR_Score.md`** / **`RideSharing_PR_Score.md`**.
+
+**Ride-Sharing Round 2 was the most consequential output.** CodeAnt re-flagged the already-fixed `GetAllStates` with 3 false positives — the post-fix code holds `s.mu.RLock` + per-trip `t.Lock` exactly as CodeAnt's Round 1 suggestion specified, and `go test -race` is clean. See `RideSharing_PR_Score.md` "Round 2" section for the manual-gate implications.
