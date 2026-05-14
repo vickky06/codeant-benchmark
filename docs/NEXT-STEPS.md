@@ -1,6 +1,6 @@
 # Next steps after PR 1 scoring
 
-Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**.
+Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**. **One-page summary:** **`docs/BENCHMARK-SUMMARY.md`**. **Recall / JSON audit:** **`docs/CALCULATION-VERIFICATION.md`**.
 
 ## 1. Fix-me loop (PR #7)
 
@@ -29,10 +29,12 @@ Goal: measure whether CodeAnt’s **“Fix in Cursor”** flow produces changes 
 
 ## 3. Merge gating (“bot as shield”)
 
-PR 1 data shows GitHub **reviews** with `state: COMMENTED` only. For production:
+**Corpus check (JSON in this repo):** Every captured `pr_reviews.json` shows CodeAnt with `state: COMMENTED` and an empty review `body` — see **`docs/CALCULATION-VERIFICATION.md`**. That is **not** a merge-blocking approval signal by itself.
 
-- Confirm on each PR whether CodeAnt publishes a **commit status / check** that branch protection can require.
-- If only comments exist, you need a thin internal workflow (Bitbucket Pipeline + API) to map “review complete” → reviewer assignment.
+For production:
+
+- Confirm in the GitHub **Checks** UI (per org/repo) whether CodeAnt publishes a **commit status / check** branch protection can require.
+- If only comments exist, use a thin workflow (e.g. Bitbucket Pipeline + API) to map “review complete” → reviewer assignment.
 
 ## 4. Bitbucket pilot
 

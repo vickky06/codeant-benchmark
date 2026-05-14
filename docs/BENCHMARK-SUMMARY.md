@@ -2,7 +2,8 @@
 
 **Repository:** [vickky06/codeant-benchmark](https://github.com/vickky06/codeant-benchmark)  
 **Canonical branch:** `main` (merged benchmark work)  
-**Last aligned to:** `PR1_CodeAnt_Score.md`, `PR2_CodeAnt_Score.md`, `UberEats_PR_Score.md`, `RateLimiter_PR_Score.md`, `RideSharing_PR_Score.md`, `docs/Go-Corpus-Design.md`, `fix_loop_results*.md`
+**Last aligned to:** `PR1_CodeAnt_Score.md`, `PR2_CodeAnt_Score.md`, `UberEats_PR_Score.md`, `RateLimiter_PR_Score.md`, `RideSharing_PR_Score.md`, `docs/Go-Corpus-Design.md`, `fix_loop_results*.md`  
+**Arithmetic + JSON audit:** **`docs/CALCULATION-VERIFICATION.md`**
 
 This page is the **single entry summary** for leadership and Confluence handoff. Detailed evidence lives in the linked score files and `*/pr_*.json` folders.
 
@@ -107,12 +108,14 @@ export GH_TOKEN='…'
 | `*_PR_AnswerKey.md` | Answer keys |
 | `fix_loop_results.md`, `fix_loop_results_go_addendum.md` | Fix-me notes |
 | `docs/Go-Corpus-Design.md`, `docs/Go-Fix-Loop-Runbook.md` | Design + runbook |
+| `docs/CALCULATION-VERIFICATION.md` | Recall weights + Ride-Sharing R2 counts + merge-gating JSON note |
 | `NETAPP_RECOMMENDATION.md` | Stakeholder recommendation |
 
 ---
 
 ## Related
 
-- **`Plan.MD`** — checklist (update after each corpus change).  
+- **`Plan.MD`** — checklist.  
 - **`README.md`** — repo entry + tables.  
-- **`docs/NEXT-STEPS.md`** — merge gating, Bitbucket, optional vendor.
+- **`docs/CALCULATION-VERIFICATION.md`** — arithmetic + merge-gating JSON audit.  
+- **`docs/NEXT-STEPS.md`** — merge gating narrative, Bitbucket, optional vendor.

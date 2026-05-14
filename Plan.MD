@@ -1,6 +1,8 @@
 # Benchmark plan — CodeAnt (Rexec + Go corpus)
 
-Living checklist for **[vickky06/codeant-benchmark](https://github.com/vickky06/codeant-benchmark)**. Primary sources of truth: **`docs/BENCHMARK-SUMMARY.md`** (one page) and per-PR `*_PR_Score.md` files.
+Living checklist for **[vickky06/codeant-benchmark](https://github.com/vickky06/codeant-benchmark)**. Primary sources of truth: **`docs/BENCHMARK-SUMMARY.md`**, **`docs/CALCULATION-VERIFICATION.md`**, and per-PR `*_PR_Score.md` files.
+
+**Status:** Benchmark corpus and scores **complete on `main`**. Optional / owner items below.
 
 ---
 
@@ -8,43 +10,44 @@ Living checklist for **[vickky06/codeant-benchmark](https://github.com/vickky06/
 
 ### Rust (Rexec)
 
-- [x] **PR #7 (defect-rich)** — [Rexec PR #7](https://github.com/vickky06/Rexec/pull/7): six seeded defects, `Rexec_PR1_AnswerKey.md`, `PR1_CodeAnt_Score.md`, `pr1_*.json`.
+- [x] **PR #7 (defect-rich)** — [Rexec PR #7](https://github.com/vickky06/Rexec/pull/7): `Rexec_PR1_AnswerKey.md`, `PR1_CodeAnt_Score.md`, `pr1_*.json`.
 - [x] **PR #8 (clean control)** — [Rexec PR #8](https://github.com/vickky06/Rexec/pull/8): `PR2_CodeAnt_Score.md`, `pr8/`.
-- [x] **PR #7 round 2** — `pr7-round2/`, narrative in `PR1_CodeAnt_Score.md`, `fix_loop_results.md`, `docs/PR7-ROUND2-EXECUTION-LOG.md`.
-- [x] **`fetch_rexec_pr.sh`** — Rexec PR JSON export (`GH_TOKEN` + curl).
+- [x] **PR #7 round 2** — `pr7-round2/`, `PR1_CodeAnt_Score.md`, `fix_loop_results.md`, `docs/PR7-ROUND2-EXECUTION-LOG.md`.
+- [x] **`fetch_rexec_pr.sh`**
 
-### Go corpus (design: `docs/Go-Corpus-Design.md`)
+### Go corpus
 
-- [x] **Uber-Eats PR #1** — `UberEats_PR_Score.md`, `UberEats_PR_AnswerKey.md`, `uber-eats-pr1/`, `uber-eats-pr1-round2/`.
-- [x] **Rate-Limiter PR #1** — `RateLimiter_PR_Score.md`, `RateLimiter_PR_AnswerKey.md`, `rate-limiter-pr1/`.
-- [x] **Ride-Sharing PR #1** — `RideSharing_PR_Score.md`, `RideSharing_PR_AnswerKey.md`, `ride-sharing-pr1/`, `ride-sharing-pr1-round2/` (round 2 FP analysis in score doc).
-- [x] **Go fix-me write-up** — `fix_loop_results_go_addendum.md` (incl. methodology note on non–Fix-in-Cursor workflow).
-- [x] **`fetch_pr.sh`** — generic `gh api` export for any `owner/repo` + PR + output dir.
+- [x] **Uber-Eats PR #1** — `UberEats_PR_*`, `uber-eats-pr1/`, `uber-eats-pr1-round2/`.
+- [x] **Rate-Limiter PR #1** — `RateLimiter_PR_*`, `rate-limiter-pr1/`.
+- [x] **Ride-Sharing PR #1** — `RideSharing_PR_*`, `ride-sharing-pr1/`, `ride-sharing-pr1-round2/`.
+- [x] **Go fix-me write-up** — `fix_loop_results_go_addendum.md`.
+- [x] **`fetch_pr.sh`**
 
-### Repo / publication
+### Repo / rigor
 
-- [x] **Merged to `main`** — benchmark corpus and scores landed on default branch.
-- [x] **Canonical summary** — `docs/BENCHMARK-SUMMARY.md` (exec + tables + validity + reproduce).
+- [x] **Merged to `main`**
+- [x] **`docs/BENCHMARK-SUMMARY.md`**
+- [x] **Weighted recall arithmetic + merge-gating JSON audit** — `docs/CALCULATION-VERIFICATION.md`
 
-### Stakeholder deliverable
+### Stakeholder
 
-- [x] **NetApp / manual gate** — `NETAPP_RECOMMENDATION.md` (+ Go corpus rationale in `docs/Go-Corpus-Design.md`).
-
----
-
-## Remaining (optional / operational)
-
-- [ ] **Rotate credentials** — If any PAT was exposed, revoke and use `export GH_TOKEN=…` or `gh auth` only in your shell.
-- [ ] **Fix-me loop (UI-driven)** — Optional: run **Fix in Cursor** per thread on a throwaway branch and record wall-clock (`Plan.MD` historically referenced Rexec PR #7; Go runbook: `docs/Go-Fix-Loop-Runbook.md`).
-- [ ] **Merge gating** — Confirm whether CodeAnt publishes a **required check** vs comments-only `COMMENTED` reviews (each PR / org).
-- [ ] **Bitbucket pilot** — Per `docs/NEXT-STEPS.md`.
-- [ ] **Optional second vendor** — Same protocol (e.g. CodeRabbit) if leadership wants A/B.
+- [x] **`NETAPP_RECOMMENDATION.md`**, **`docs/Go-Corpus-Design.md`**
 
 ---
 
-## Fix-me loop — PR #7 (Rexec, reference)
+## Optional / owner (not required to close benchmark)
 
-**Goal:** Measure **comment → Fix in Cursor → commit** (not hand-authored diffs only). Procedure: open [Rexec PR #7](https://github.com/vickky06/Rexec/pull/7) → inline comment → **Fix in Cursor** → `cargo check` / `clippy` / `test` → record in `fix_loop_results.md`. Optional if fixes already merged.
+- [ ] **UI “Fix in Cursor” measurement** — If you want product-level timing: `docs/Go-Fix-Loop-Runbook.md` + Rexec notes in `fix_loop_results.md` (fixes already landed; purely optional).
+- [ ] **PAT hygiene** — Revoke benchmark tokens when study is fully closed (operational, not a repo deliverable).
+- [ ] **Live Checks tab** — Org-specific: confirm CodeAnt app publishes a **required check** if you rely on branch protection (beyond JSON `COMMENTED` reviews — see `docs/CALCULATION-VERIFICATION.md`).
+
+**Roadmap (outside this repo’s closure):** Bitbucket pilot, second vendor — **`docs/NEXT-STEPS.md`** §4–5.
+
+---
+
+## Fix-me reference (Rexec PR #7)
+
+Optional **Fix in Cursor** workflow: GitHub PR #7 inline comments → Cursor → `cargo check` / `clippy` / `test` → record in `fix_loop_results.md`.
 
 ---
 
@@ -52,11 +55,12 @@ Living checklist for **[vickky06/codeant-benchmark](https://github.com/vickky06/
 
 | Doc | Purpose |
 |-----|---------|
-| **`docs/BENCHMARK-SUMMARY.md`** | Canonical one-page summary (all arms). |
-| `docs/Go-Corpus-Design.md` | Why Uber-Eats + Rate-Limiter (+ Ride-Sharing). |
-| `docs/Go-Fix-Loop-Runbook.md` | Go fix-me / UI workflow. |
-| `docs/NEXT-STEPS.md` | Merge gating, Bitbucket, vendor. |
-| `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Rexec scores. |
-| `UberEats_PR_Score.md` / `RateLimiter_PR_Score.md` / `RideSharing_PR_Score.md` | Go scores. |
-| `NETAPP_RECOMMENDATION.md` | Gate recommendation. |
+| **`docs/BENCHMARK-SUMMARY.md`** | One-page summary (all arms). |
+| **`docs/CALCULATION-VERIFICATION.md`** | Recall arithmetic + Ride-Sharing R2 FP counts + merge-gating JSON note. |
+| `docs/Go-Corpus-Design.md` | Corpus rationale. |
+| `docs/Go-Fix-Loop-Runbook.md` | Go UI fix-me. |
+| `docs/NEXT-STEPS.md` | Merge gating narrative, Bitbucket, vendor A/B. |
+| `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Rexec. |
+| `UberEats_PR_Score.md` / `RateLimiter_PR_Score.md` / `RideSharing_PR_Score.md` | Go. |
+| `NETAPP_RECOMMENDATION.md` | Gate write-up. |
 | `README.md` | Entry tables. |
