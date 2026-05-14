@@ -112,6 +112,7 @@ export GH_TOKEN='…'
 | `docs/Go-Corpus-Design.md`, `docs/Go-Fix-Loop-Runbook.md` | Design + runbook |
 | `docs/CALCULATION-VERIFICATION.md` | Recall weights + Ride-Sharing R2 counts + merge-gating JSON note |
 | `docs/CODEANT-VS-CLAUDE-AGENT.md` | CodeAnt vs Claude-based agent (qualitative) |
+| `docs/CONFLUENCE-EXPORT.md` | Confluence-oriented export + Mermaid + chart data |
 | `NETAPP_RECOMMENDATION.md` | Stakeholder recommendation |
 
 ---
@@ -122,4 +123,5 @@ export GH_TOKEN='…'
 - **`README.md`** — repo entry + tables.  
 - **`docs/CALCULATION-VERIFICATION.md`** — arithmetic + merge-gating JSON audit.  
 - **`docs/CODEANT-VS-CLAUDE-AGENT.md`** — qualitative comparison vs a Claude-based agent; not a numeric head-to-head unless re-run with same rubric.  
+- **`docs/CONFLUENCE-EXPORT.md`** — Confluence page body, Mermaid diagrams, stacked-bar source table.  
 - **`docs/NEXT-STEPS.md`** — merge gating narrative, Bitbucket, optional vendor.

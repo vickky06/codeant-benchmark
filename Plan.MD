@@ -61,6 +61,7 @@ Optional **Fix in Cursor** workflow: GitHub PR #7 inline comments → Cursor →
 | `docs/Go-Fix-Loop-Runbook.md` | Go UI fix-me. |
 | `docs/NEXT-STEPS.md` | Merge gating narrative, Bitbucket, vendor A/B. |
 | `docs/CODEANT-VS-CLAUDE-AGENT.md` | CodeAnt vs a Claude-based reviewer (qualitative; head-to-head needs same rubric). |
+| `docs/CONFLUENCE-EXPORT.md` | Confluence paste pack (tables, Mermaid, native chart steps). |
 | `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Rexec. |
 | `UberEats_PR_Score.md` / `RateLimiter_PR_Score.md` / `RideSharing_PR_Score.md` | Go. |
 | `NETAPP_RECOMMENDATION.md` | Gate write-up. |
