@@ -89,6 +89,7 @@ export GH_TOKEN='…'
 | `pr8/*.json` | Control arm snapshot |
 | `docs/PR8-comments-inventory.md` | PR #8 thread inventory |
 | `docs/PR7-ROUND2-EXECUTION-LOG.md` | This runbook |
+| **`docs/BENCHMARK-SUMMARY.md`** | **Canonical one-page summary** for Confluence / leadership |
 | `Plan.MD` | Overall plan |
 
 - [ ] **Merge** findings branch to `main` (or close PR) when you are ready — only remaining **repo** gate for “documentation final.”

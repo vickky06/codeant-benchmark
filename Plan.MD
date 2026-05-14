@@ -67,6 +67,7 @@ Living checklist for the **vickky06/Rexec** PR benchmark and **codeant-benchmark
 
 | Doc | Purpose |
 |-----|---------|
+| **`docs/BENCHMARK-SUMMARY.md`** | **Canonical one-page summary** (exec bullets, tables, validity, reproduce). |
 | `docs/NEXT-STEPS.md` | Short operational next steps (merge gating, Bitbucket). |
 | `fix_loop_results.md` | Fix-me outcomes (append UI-driven run when complete). |
 | `PR1_CodeAnt_Score.md` / `PR2_CodeAnt_Score.md` | Scored results. |

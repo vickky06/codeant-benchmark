@@ -1,6 +1,6 @@
 # Next steps after PR 1 scoring
 
-Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**.
+Round 2 snapshot and checklist: **`docs/PR7-ROUND2-EXECUTION-LOG.md`**. Overall status: **`Plan.MD`**. **One-page summary:** **`docs/BENCHMARK-SUMMARY.md`**.
 
 ## 1. Fix-me loop (PR #7)
 

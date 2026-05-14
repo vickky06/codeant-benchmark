@@ -2,6 +2,8 @@
 
 This repository holds **reproducible artifacts** and **scored findings** for evaluating [CodeAnt AI](https://codeant.ai) on a controlled pull request.
 
+**One-page summary (exec + methodology + links):** **`docs/BENCHMARK-SUMMARY.md`**
+
 ## Benchmark PR (defect-rich)
 
 - **Application repo:** [vickky06/Rexec](https://github.com/vickky06/Rexec)
